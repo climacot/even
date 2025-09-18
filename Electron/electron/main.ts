@@ -60,7 +60,7 @@ function createWindow() {
 
   const web = new WebContentsView();
 
-  win.contentView.addChildView(web);
+  // win.contentView.addChildView(web);
   web.webContents.loadURL("https://google.com");
   web.webContents.zoomLevel = 0;
 
