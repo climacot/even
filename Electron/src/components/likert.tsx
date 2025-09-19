@@ -21,14 +21,16 @@ export const Likert = ({
         <li className="inline-flex items-center text-sm font-medium bg-white border border-gray-200 text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-800 dark:border-neutral-700 dark:text-white">
           <label
             htmlFor={`${id}-${value}`}
-            className="relative flex items-start w-full gap-x-2 py-3 px-4 "
+            className="relative flex items-start w-full gap-x-2 py-3 px-4 cursor-pointer"
           >
             <div className="flex items-center h-5">
               <input
+                value={value}
                 id={`${id}-${value}`}
                 name={id}
                 type="radio"
-                className="border-gray-200 rounded-full disabled:opacity-50 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
+                className="cursor-pointer border-gray-200 rounded-full disabled:opacity-50 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
+                onChange={(event) => onChange(event.target.value)}
               />
             </div>
             <span className="ms-3 block w-full text-sm text-gray-600 dark:text-neutral-500">
@@ -68,7 +70,12 @@ export const Likert = ({
       </div>
       <div className="flex justify-between">
         {labels.map((label, index) => (
-          <span key={index}>{label}</span>
+          <span
+            className="flex-1 text-center first:text-left last:text-right"
+            key={index}
+          >
+            {label}
+          </span>
         ))}
       </div>
     </div>

@@ -10,6 +10,7 @@ type State = {
   currentView: number;
   nextView: () => void;
   prevView: () => void;
+  resetView: () => void;
   fullName?: string;
   setFullName: (value: string) => void;
   experience?: string;
@@ -21,15 +22,15 @@ type State = {
   navigation: Navigation[];
   addNavigation: (url: string) => void;
   ratedNavigation: (url: string, rated: string) => void;
-  isModalOpen: boolean;
-  openModal: () => void;
-  closeModal: () => void;
+  complex?: string;
+  setComplex: (rated: string) => void;
 };
 
 export const useStore = create<State>((set) => ({
   currentView: 1,
   nextView: () => set((state) => ({ currentView: state.currentView + 1 })),
   prevView: () => set((state) => ({ currentView: state.currentView - 1 })),
+  resetView: () => set({ currentView: 1 }),
   fullName: undefined,
   setFullName: (value) => set({ fullName: value }),
   experience: undefined,
@@ -54,7 +55,6 @@ export const useStore = create<State>((set) => ({
       }),
     }));
   },
-  isModalOpen: false,
-  openModal: () => set({ isModalOpen: true }),
-  closeModal: () => set({ isModalOpen: false }),
+  complex: undefined,
+  setComplex: (rated) => set({ complex: rated }),
 }));

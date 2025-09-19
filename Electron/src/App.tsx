@@ -2,6 +2,7 @@ import { useStore } from "@/hooks/use-store";
 import { InitialView } from "./views/initial";
 import { FeelingView } from "./views/metacognitive";
 import { TaskView } from "./views/task";
+import { FinalView } from "./views/final";
 
 export const App = () => {
   const { currentView } = useStore();
@@ -14,6 +15,8 @@ export const App = () => {
         <FeelingView />
       ) : currentView === 3 ? (
         <TaskView />
+      ) : currentView === 4 ? (
+        <FinalView />
       ) : null}
     </div>
   );
