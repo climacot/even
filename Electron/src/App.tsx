@@ -1,8 +1,8 @@
 import { useStore } from "@/hooks/use-store";
-import { InitialView } from "./views/initial";
-import { FeelingView } from "./views/metacognitive";
-import { TaskView } from "./views/task";
-import { FinalView } from "./views/final";
+import { View1 } from "./views/view1";
+import { View2 } from "./views/view2";
+import { View3 } from "./views/view3";
+import { View4 } from "./views/view4";
 
 export const App = () => {
   const { currentView } = useStore();
@@ -10,13 +10,13 @@ export const App = () => {
   return (
     <div>
       {currentView === 1 ? (
-        <InitialView />
+        <View1 />
       ) : currentView === 2 ? (
-        <FeelingView />
+        <View2 />
       ) : currentView === 3 ? (
-        <TaskView />
+        <View3 />
       ) : currentView === 4 ? (
-        <FinalView />
+        <View4 />
       ) : null}
     </div>
   );

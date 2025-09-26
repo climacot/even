@@ -3,7 +3,7 @@ import { Input } from "@/components/input";
 import { useStore } from "@/hooks/use-store";
 import { useForm, Controller } from "react-hook-form";
 
-export const InitialView = () => {
+export const View1 = () => {
   const { nextView, setFullName } = useStore();
 
   const form = useForm({
@@ -14,6 +14,7 @@ export const InitialView = () => {
 
   return (
     <form
+      className="p-4 flex flex-col gap-4"
       onSubmit={form.handleSubmit(({ fullName }) => {
         setFullName(fullName);
         nextView();

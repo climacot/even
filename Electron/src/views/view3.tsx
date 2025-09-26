@@ -1,4 +1,5 @@
 import { Button } from "@/components/button";
+import WebIcon from "@/components/icons/web";
 import { Likert } from "@/components/likert";
 import { Modal } from "@/components/modal";
 import { useModal } from "@/hooks/use-modal";
@@ -35,13 +36,18 @@ const NavigationModal = ({
     isModalOpen && (
       <Modal>
         <form
+          className="p-8 flex flex-col gap-4"
           onSubmit={form.handleSubmit(({ rated }) => {
             ratedNavigation(url, rated!);
             closeModal();
           })}
         >
-          <div>Clasificación del resultado anterior</div>
-          <div>Clasifique en base a la siguiente escala</div>
+          <div>
+            <div className="text-lg font-bold">
+              Clasificación del resultado anterior
+            </div>
+            <div>Clasifique en base a la siguiente escala</div>
+          </div>
           <Controller
             control={form.control}
             rules={{ required: true }}
@@ -97,14 +103,19 @@ const ComplexModal = ({
     isModalOpen && (
       <Modal>
         <form
+          className="p-8 flex flex-col gap-4"
           onSubmit={form.handleSubmit(({ rated }) => {
             setComplex(rated!);
             closeModal();
             nextView();
           })}
         >
-          <div>Clasificación complejidad tarea 1</div>
-          <div>Clasifique en base a la siguiente escala</div>
+          <div>
+            <div className="text-lg font-bold">
+              Clasificación complejidad tarea 1
+            </div>
+            <div>Clasifique en base a la siguiente escala</div>
+          </div>
           <Controller
             control={form.control}
             name="rated"
@@ -121,9 +132,6 @@ const ComplexModal = ({
               );
             }}
           />
-          <Button variant="solid" color="white" onClick={() => closeModal()}>
-            Cancelar
-          </Button>
           <Button
             disabled={!form.formState.isValid}
             variant="solid"
@@ -138,7 +146,7 @@ const ComplexModal = ({
   );
 };
 
-export const TaskView = () => {
+export const View3 = () => {
   const { resources, addResource, addNavigation } = useStore();
 
   const {
@@ -160,7 +168,7 @@ export const TaskView = () => {
 
   return (
     <>
-      <div>
+      <div className="p-4 flex flex-col gap-4">
         <div className="font-bold text-2xl">SFE3000</div>
         <div>Tarea 1/1</div>
         <p>
@@ -191,7 +199,12 @@ export const TaskView = () => {
           <div className="py-2.5 sm:py-3 px-4 block w-full border border-gray-200 rounded-lg sm:text-sm dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
             {resources.length === 0
               ? "Aún no se ha seleccionado ningún recurso."
-              : resources.map((rsc, index) => <div key={index}>{rsc}</div>)}
+              : resources.map((rsc, index) => (
+                  <div key={index} className="flex gap-4">
+                    <WebIcon />
+                    <span className="font-medium">{rsc}</span>
+                  </div>
+                ))}
           </div>
         </div>
         <Button

@@ -8,7 +8,7 @@ type State = {
   feeling?: string;
 };
 
-export const FeelingView = () => {
+export const View2 = () => {
   const { nextView, setExperience, setFeeling } = useStore();
 
   const form = useForm<State>({
@@ -20,6 +20,7 @@ export const FeelingView = () => {
 
   return (
     <form
+      className="p-4 flex flex-col gap-4"
       onSubmit={form.handleSubmit(({ experience, feeling }) => {
         setExperience(experience!);
         setFeeling(feeling!);
@@ -29,8 +30,8 @@ export const FeelingView = () => {
       <div className="font-bold text-2xl">SFE3000</div>
       <div>Tarea 1/1</div>
       <p>
-        Imagina que trabajas en un proyecto de clase sobre inteligencia
-        artificial aplicado a la salud. Tu tarea es encontrar un dataset
+        Imagine que trabaja en un proyecto de clase sobre inteligencia
+        artificial aplicado a la salud. Su tarea es encontrar un dataset
         confiable que contenga información sobre enfermedades o condiciones de
         salud.
       </p>
@@ -54,7 +55,7 @@ export const FeelingView = () => {
         rules={{ required: true }}
         render={({ field: { onChange } }) => (
           <Likert
-            label="¿Qué tan confiado se encuentra en que encontrará un datataset?"
+            label="¿Qué tan confiad@ se encuentra en que encontrará un datataset?"
             values={["1", "2", "3", "4", "5"]}
             labels={["poca", "neutral", "mucha"]}
             onChange={(value) => onChange(value)}

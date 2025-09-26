@@ -9,7 +9,7 @@ export const Modal = forwardRef<HTMLDivElement, Props>((props, _) => {
 
   return (
     <div className="fixed inset-0 bg-black/20 flex justify-center items-center">
-      <div className="p-4 bg-white rounded-md">{children}</div>
+      <div className="bg-white rounded-md">{children}</div>
     </div>
   );
 });
