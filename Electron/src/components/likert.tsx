@@ -18,7 +18,10 @@ export const Likert = ({
   return variant === "vertical" ? (
     <ul className="max-w-sm flex flex-col">
       {values.map((value, index) => (
-        <li className="inline-flex items-center text-sm font-medium bg-white border border-gray-200 text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-800 dark:border-neutral-700 dark:text-white">
+        <li
+          key={value}
+          className="inline-flex items-center text-sm font-medium bg-white border border-gray-200 text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-800 dark:border-neutral-700 dark:text-white"
+        >
           <label
             htmlFor={`${id}-${value}`}
             className="relative flex items-start w-full gap-x-2 py-3 px-4 cursor-pointer"

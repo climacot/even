@@ -1,5 +1,5 @@
-import clsx from "clsx";
 import { ButtonHTMLAttributes, forwardRef } from "react";
+import clsx from "clsx";
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant: "solid" | "soft";

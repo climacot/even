@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, WebContentsView } from "electron";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
+import common from "./common.json";
 import path from "node:path";
 
 createRequire(import.meta.url);
@@ -17,7 +18,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // │
 process.env.APP_ROOT = path.join(__dirname, "..");
 
-// 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 export const VITE_DEV_SERVER_URL = process.env["VITE_DEV_SERVER_URL"];
 export const MAIN_DIST = path.join(process.env.APP_ROOT, "dist-electron");
 export const RENDERER_DIST = path.join(process.env.APP_ROOT, "dist");
@@ -27,83 +27,107 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   : RENDERER_DIST;
 
 let win: BrowserWindow | null;
+const INITIAL_BROWSER_URL = common.initialWeb;
+
+// ------------------------- DISABLE BOTS ----------------------
+
+app.commandLine.appendSwitch("disable-blink-features", "AutomationControlled");
+const USER_AGENT = common.userAgent;
 
 function createWindow() {
+  let isModalOpen = false;
+
+  // ----------------------- MAIN VIEW --------------------------
+
   win = new BrowserWindow({
+    show: false,
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs"),
-      webviewTag: true,
     },
   });
 
-  // Test active push message to Renderer-process.
-  win.webContents.on("did-finish-load", () => {
-    win?.webContents.send("main-process-message", new Date().toLocaleString());
-  });
+  win.maximize();
+  win.show();
 
-  if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL);
-  } else {
-    // win.loadFile('dist/index.html')
-    win.loadFile(path.join(RENDERER_DIST, "index.html"));
-  }
-
-  const leftPercentage = 0.2;
-  const topPercentage = 0.05;
-
-  const [width, height] = win.getContentSize();
-  const topHeight = Math.floor(height * topPercentage);
-  const bottomHeight = height - topHeight;
-  const leftWidth = Math.floor(width * leftPercentage);
-  const rightWidth = width - leftWidth;
+  // ----------------------- BROWSER WEB ------------------------
 
   const web = new WebContentsView();
 
-  // win.contentView.addChildView(web);
-  web.webContents.loadURL("https://google.com");
-  web.webContents.zoomLevel = 0;
+  web.webContents.loadURL(INITIAL_BROWSER_URL, { userAgent: USER_AGENT });
+  win.contentView.addChildView(web, 0);
 
-  web.setBounds({
-    x: leftWidth,
-    y: topHeight,
-    width: rightWidth,
-    height: bottomHeight,
+  // ----------------------- HTML -------------------------------
+
+  const html = new WebContentsView({
+    webPreferences: {
+      preload: path.join(__dirname, "preload.mjs"),
+      transparent: true,
+    },
   });
 
-  win.on("resize", () => {
-    const [newWidth, newHeight] = win!.getContentSize();
-    const topHeight = Math.floor(newHeight * topPercentage);
-    const bottomHeight = newHeight - topHeight;
-    const leftWidth = Math.floor(newWidth * leftPercentage);
-    const rightWidth = newWidth - leftWidth;
+  // html.webContents.openDevTools({ mode: "undocked" });
+
+  if (VITE_DEV_SERVER_URL) {
+    html.webContents.loadURL(VITE_DEV_SERVER_URL);
+  } else {
+    html.webContents.loadFile(path.join(RENDERER_DIST, "index.html"));
+  }
+
+  win.contentView.addChildView(html, 1);
+
+  // ----------------------- FUNCTIONS ---------------------------
+
+  const resizeViews = () => {
+    const { width, height } = win!.getContentBounds();
+
+    const leftWidth = 400;
+    const rightWidth = width - leftWidth;
 
     web.setBounds({
-      x: leftWidth,
-      y: topHeight,
       width: rightWidth,
-      height: bottomHeight,
+      height: height,
+      x: leftWidth,
+      y: 0,
     });
+
+    html.setBounds({
+      width: isModalOpen ? width : 400,
+      height,
+      x: 0,
+      y: 0,
+    });
+  };
+
+  resizeViews();
+
+  // -------------------- SCRIPTS --------------------------------
+
+  win.on("resize", resizeViews);
+
+  ipcMain.handle("modal", async (_, isOpen) => {
+    isModalOpen = isOpen;
+    resizeViews();
   });
 
+  // -------------------- NAVEGACION -----------------------------
+
   web.webContents.on("did-navigate", (_, url) => {
-    win!.webContents.send("link-clicked", url);
+    win && win.webContents.send("link-clicked", url);
   });
 
   web.webContents.on("did-navigate-in-page", (_, url) => {
-    win!.webContents.send("link-clicked", url);
+    win && win.webContents.send("link-clicked", url);
   });
 
   ipcMain.on("go-back", () => {
-    if (web.webContents.navigationHistory.canGoBack()) {
-      web.webContents.navigationHistory.goBack();
-    }
+    if (!web.webContents.navigationHistory.canGoBack()) return;
+    web.webContents.navigationHistory.goBack();
   });
 
   ipcMain.on("go-forward", () => {
-    if (web.webContents.navigationHistory.canGoForward()) {
-      web.webContents.navigationHistory.goForward();
-    }
+    if (!web.webContents.navigationHistory.canGoForward()) return;
+    web.webContents.navigationHistory.goForward();
   });
 }
 

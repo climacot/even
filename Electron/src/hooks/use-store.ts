@@ -24,6 +24,7 @@ type State = {
   ratedNavigation: (url: string, rated: string) => void;
   complex?: string;
   setComplex: (rated: string) => void;
+  reset: () => void;
 };
 
 export const useStore = create<State>((set) => ({
@@ -57,4 +58,14 @@ export const useStore = create<State>((set) => ({
   },
   complex: undefined,
   setComplex: (rated) => set({ complex: rated }),
+  reset: () => {
+    set({
+      currentView: 1,
+      fullName: undefined,
+      experience: undefined,
+      feeling: undefined,
+      resources: [],
+      navigation: [],
+    });
+  },
 }));

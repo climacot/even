@@ -9,7 +9,7 @@ export const View4 = () => {
     resources,
     navigation,
     complex,
-    resetView,
+    reset,
   } = useStore();
 
   return (
@@ -30,7 +30,7 @@ export const View4 = () => {
         color="blue"
         variant="solid"
         onClick={() => {
-          resetView();
+          reset();
         }}
       >
         Regresar al inicio
