@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body style="height: 39px; border-bottom: 1px solid #e5e7eb; margin: 0px">
+    <div style="display: flex">
+      <button id="home">Inicio</button>
+      <button id="prev">Atras</button>
+      <button id="next">Adelante</button>
+      <span id="loader" style="display: none">Cargando...</span>
+    </div>
+    <script>
+      const $home = document.getElementById("home");
+      const $next = document.getElementById("next");
+      const $prev = document.getElementById("prev");
+      const $loader = document.getElementById("loader");
+
+      $home.addEventListener("click", () => {
+        window.ipcRenderer.send("go-home");
+      });
+
+      $next.addEventListener("click", () => {
+        window.ipcRenderer.send("go-forward");
+      });
+
+      $prev.addEventListener("click", () => {
+        window.ipcRenderer.send("go-back");
+      });
+
+      window.ipcRenderer.on("browser:loading:start", () => {
+        $loader.style.display = "inline";
+      });
+
+      window.ipcRenderer.on("browser:loading:stop", () => {
+        $loader.style.display = "none";
+      });
+    </script>
+  </body>
+</html>

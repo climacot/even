@@ -57,6 +57,26 @@ function createWindow() {
   web.webContents.loadURL(INITIAL_BROWSER_URL, { userAgent: USER_AGENT });
   win.contentView.addChildView(web, 0);
 
+  // ----------------------- NAVIGATION -------------------------
+
+  const navigation = new WebContentsView({
+    webPreferences: {
+      preload: path.join(__dirname, "preload.mjs"),
+    },
+  });
+
+  if (VITE_DEV_SERVER_URL) {
+    navigation.webContents.loadURL(VITE_DEV_SERVER_URL + "navigation.html");
+  } else {
+    navigation.webContents.loadFile(
+      path.join(RENDERER_DIST, "navigation.html")
+    );
+  }
+
+  navigation.webContents.openDevTools({ mode: "undocked" });
+
+  win.contentView.addChildView(navigation, 1);
+
   // ----------------------- HTML -------------------------------
 
   const html = new WebContentsView({
@@ -74,7 +94,7 @@ function createWindow() {
     html.webContents.loadFile(path.join(RENDERER_DIST, "index.html"));
   }
 
-  win.contentView.addChildView(html, 1);
+  win.contentView.addChildView(html, 2);
 
   // ----------------------- FUNCTIONS ---------------------------
 
@@ -83,12 +103,21 @@ function createWindow() {
 
     const leftWidth = 400;
     const rightWidth = width - leftWidth;
+    const topHeight = 40;
+    const bottomHeight = height - topHeight;
+
+    navigation.setBounds({
+      width: rightWidth,
+      height: topHeight,
+      x: leftWidth,
+      y: 0,
+    });
 
     web.setBounds({
       width: rightWidth,
-      height: height,
+      height: bottomHeight,
       x: leftWidth,
-      y: 0,
+      y: topHeight,
     });
 
     html.setBounds({
@@ -112,12 +141,24 @@ function createWindow() {
 
   // -------------------- NAVEGACION -----------------------------
 
+  web.webContents.on("did-start-loading", () => {
+    navigation.webContents.send("browser:loading:start");
+  });
+
+  web.webContents.on("did-stop-loading", () => {
+    navigation.webContents.send("browser:loading:stop");
+  });
+
   web.webContents.on("did-navigate", (_, url) => {
     win && win.webContents.send("link-clicked", url);
   });
 
   web.webContents.on("did-navigate-in-page", (_, url) => {
     win && win.webContents.send("link-clicked", url);
+  });
+
+  ipcMain.on("go-home", () => {
+    web.webContents.navigationHistory.goToIndex(0);
   });
 
   ipcMain.on("go-back", () => {
