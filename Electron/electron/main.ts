@@ -47,6 +47,7 @@ function createWindow() {
     },
   });
 
+  win.setMenuBarVisibility(false);
   win.maximize();
   win.show();
 
@@ -73,7 +74,7 @@ function createWindow() {
     );
   }
 
-  navigation.webContents.openDevTools({ mode: "undocked" });
+  // navigation.webContents.openDevTools({ mode: "undocked" });
 
   win.contentView.addChildView(navigation, 1);
 
@@ -86,7 +87,7 @@ function createWindow() {
     },
   });
 
-  // html.webContents.openDevTools({ mode: "undocked" });
+  html.webContents.openDevTools({ mode: "undocked" });
 
   if (VITE_DEV_SERVER_URL) {
     html.webContents.loadURL(VITE_DEV_SERVER_URL);
@@ -134,12 +135,14 @@ function createWindow() {
 
   win.on("resize", resizeViews);
 
+  // -------------------- MODAL ----------------------------------
+
   ipcMain.handle("modal", async (_, isOpen) => {
     isModalOpen = isOpen;
     resizeViews();
   });
 
-  // -------------------- NAVEGACION -----------------------------
+  // -------------------- NAVEGACION ------------------------------
 
   web.webContents.on("did-start-loading", () => {
     navigation.webContents.send("browser:loading:start");
@@ -149,12 +152,20 @@ function createWindow() {
     navigation.webContents.send("browser:loading:stop");
   });
 
-  web.webContents.on("did-navigate", (_, url) => {
-    win && win.webContents.send("link-clicked", url);
+  // let lastUrl: string;
+
+  web.webContents.on("did-navigate-in-page", (event, url) => {
+    console.log(url);
+    if (url.startsWith("https://www.google.com")) return;
+    html.webContents.send("modal:open:path", url);
+    web.webContents.navigationHistory.goBack();
+    // if (url === lastUrl) return;
+    // lastUrl = url;
+    // html.webContents.send("browser:path:change", url);
   });
 
-  web.webContents.on("did-navigate-in-page", (_, url) => {
-    win && win.webContents.send("link-clicked", url);
+  ipcMain.on("modal:close:path", (_, url) => {
+    web.webContents.loadURL(url, { userAgent: USER_AGENT });
   });
 
   ipcMain.on("go-home", () => {

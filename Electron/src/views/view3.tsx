@@ -2,7 +2,7 @@ import { Button } from "@/components/button";
 import { Controller, useForm } from "react-hook-form";
 import { Likert } from "@/components/likert";
 import { Modal } from "@/components/modal";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useModal } from "@/hooks/use-modal";
 import { useStore } from "@/hooks/use-store";
 import WebIcon from "@/components/icons/web";
@@ -122,6 +122,9 @@ const ComplexModal = ({
 };
 
 export const View3 = () => {
+  const previousR = useRef<string>(null);
+  const currentR = useRef<string>(null);
+
   const { resources, addResource, ratedNavigation, setComplex, nextView } =
     useStore();
 
@@ -137,13 +140,39 @@ export const View3 = () => {
     closeModal: closeModalComplex,
   } = useModal();
 
+  // useEffect(() => {
+  //   async function handler(_: any, path: string) {
+  //     if (path.startsWith("https://www.google.com")) return;
+  //     const { navigation, addNavigation } = useStore.getState();
+  //     const current = navigation.find((value) => value.url === path);
+  //     if (!current) addNavigation(path);
+  //     if (navigation.length === 0) return;
+  //     const previous = navigation.at(-2)!;
+  //     if (previous.isRated) return;
+  //     previousR.current = previous.url;
+  //     await window.ipcRenderer.invoke("modal", true);
+  //     openModalNavgation();
+  //   }
+
+  //   window.ipcRenderer.on("browser:path:change", handler);
+
+  //   return () => {
+  //     window.ipcRenderer.off("browser:path:change", handler);
+  //   };
+  // }, []);
+
   useEffect(() => {
-    async function func() {
-      await window.ipcRenderer.invoke("modal", true);
+    async function handler(_: any, path: string) {
+      console.log(path)
+      currentR.current = path;
       openModalNavgation();
     }
 
-    func();
+    window.ipcRenderer.on("modal:open:path", handler);
+
+    return () => {
+      window.ipcRenderer.off("modal:open:path", handler);
+    };
   }, []);
 
   return (
@@ -202,7 +231,8 @@ export const View3 = () => {
         <NavigationModal
           onSubmit={async ({ rated }) => {
             await window.ipcRenderer.invoke("modal", false);
-            ratedNavigation("https://google.com", rated!);
+            ratedNavigation(currentR.current!, rated);
+            window.ipcRenderer.send("modal:close:path", currentR.current!);
             closeModalNavigation();
           }}
         />
@@ -211,7 +241,7 @@ export const View3 = () => {
         <ComplexModal
           onSubmit={async ({ rated }) => {
             await window.ipcRenderer.invoke("modal", false);
-            setComplex(rated!);
+            setComplex(rated);
             closeModalComplex();
             nextView();
           }}
