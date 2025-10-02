@@ -37,12 +37,8 @@
         window.ipcRenderer.send("go-back");
       });
 
-      window.ipcRenderer.on("browser:loading:start", () => {
-        $loader.style.display = "inline";
-      });
-
-      window.ipcRenderer.on("browser:loading:stop", () => {
-        $loader.style.display = "none";
+      window.ipcRenderer.on("browser:loading", (event, isLoading) => {
+        $loader.style.display = isLoading ? "inline" : "none";
       });
     </script>
   </body>

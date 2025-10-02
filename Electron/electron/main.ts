@@ -29,14 +29,19 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 let win: BrowserWindow | null;
 const INITIAL_BROWSER_URL = common.initialWeb;
 
+// ------------------------- VARIABLES -------------------------
+
+let lastBlockedUrl: string | null = null;
+let isModalOpen: boolean = false;
+let shouldNavigate: boolean | null;
+const visitedUrls = new Set<string>();
+
 // ------------------------- DISABLE BOTS ----------------------
 
 app.commandLine.appendSwitch("disable-blink-features", "AutomationControlled");
 const USER_AGENT = common.userAgent;
 
 function createWindow() {
-  let isModalOpen = false;
-
   // ----------------------- MAIN VIEW --------------------------
 
   win = new BrowserWindow({
@@ -87,7 +92,7 @@ function createWindow() {
     },
   });
 
-  html.webContents.openDevTools({ mode: "undocked" });
+  // html.webContents.openDevTools({ mode: "undocked" });
 
   if (VITE_DEV_SERVER_URL) {
     html.webContents.loadURL(VITE_DEV_SERVER_URL);
@@ -137,7 +142,37 @@ function createWindow() {
 
   // -------------------- MODAL ----------------------------------
 
-  ipcMain.handle("modal", async (_, isOpen) => {
+  web.webContents.on("will-navigate", (event, url) => {
+    if (url.startsWith("https://www.google.com")) return;
+    if (visitedUrls.has(url)) return;
+    event.preventDefault();
+    shouldNavigate = true;
+    lastBlockedUrl = url;
+    isModalOpen = true;
+    resizeViews();
+    html.webContents.send("modal:navigation:open", url);
+  });
+
+  web.webContents.on("did-navigate-in-page", (_, url) => {
+    if (url.startsWith("https://www.google.com")) return;
+    if (visitedUrls.has(url)) return;
+    shouldNavigate = false;
+    lastBlockedUrl = url;
+    isModalOpen = true;
+    resizeViews();
+    html.webContents.send("modal:navigation:open", url);
+  });
+
+  ipcMain.on("modal:navigation:close", () => {
+    if (!lastBlockedUrl) return;
+    isModalOpen = false;
+    resizeViews();
+    shouldNavigate === true && web.webContents.loadURL(lastBlockedUrl);
+    visitedUrls.add(lastBlockedUrl);
+    lastBlockedUrl = null;
+  });
+
+  ipcMain.on("modal:state", (_, isOpen) => {
     isModalOpen = isOpen;
     resizeViews();
   });
@@ -145,27 +180,11 @@ function createWindow() {
   // -------------------- NAVEGACION ------------------------------
 
   web.webContents.on("did-start-loading", () => {
-    navigation.webContents.send("browser:loading:start");
+    navigation.webContents.send("browser:loading", true);
   });
 
   web.webContents.on("did-stop-loading", () => {
-    navigation.webContents.send("browser:loading:stop");
-  });
-
-  // let lastUrl: string;
-
-  web.webContents.on("did-navigate-in-page", (event, url) => {
-    console.log(url);
-    if (url.startsWith("https://www.google.com")) return;
-    html.webContents.send("modal:open:path", url);
-    web.webContents.navigationHistory.goBack();
-    // if (url === lastUrl) return;
-    // lastUrl = url;
-    // html.webContents.send("browser:path:change", url);
-  });
-
-  ipcMain.on("modal:close:path", (_, url) => {
-    web.webContents.loadURL(url, { userAgent: USER_AGENT });
+    navigation.webContents.send("browser:loading", false);
   });
 
   ipcMain.on("go-home", () => {

@@ -2,7 +2,7 @@ import { Button } from "@/components/button";
 import { Controller, useForm } from "react-hook-form";
 import { Likert } from "@/components/likert";
 import { Modal } from "@/components/modal";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useModal } from "@/hooks/use-modal";
 import { useStore } from "@/hooks/use-store";
 import WebIcon from "@/components/icons/web";
@@ -122,9 +122,6 @@ const ComplexModal = ({
 };
 
 export const View3 = () => {
-  const previousR = useRef<string>(null);
-  const currentR = useRef<string>(null);
-
   const { resources, addResource, ratedNavigation, setComplex, nextView } =
     useStore();
 
@@ -162,16 +159,16 @@ export const View3 = () => {
   // }, []);
 
   useEffect(() => {
-    async function handler(_: any, path: string) {
-      console.log(path)
-      currentR.current = path;
+    const channel = "modal:navigation:open";
+
+    function func() {
       openModalNavgation();
     }
 
-    window.ipcRenderer.on("modal:open:path", handler);
+    window.ipcRenderer.on(channel, func);
 
     return () => {
-      window.ipcRenderer.off("modal:open:path", handler);
+      window.ipcRenderer.off(channel, func);
     };
   }, []);
 
@@ -220,8 +217,9 @@ export const View3 = () => {
           variant="solid"
           color="blue"
           onClick={async () => {
-            await window.ipcRenderer.invoke("modal", true);
             openModalComplex();
+
+            window.ipcRenderer.send("modal:state", true);
           }}
         >
           Finalizar tarea 1
@@ -230,20 +228,21 @@ export const View3 = () => {
       {isModalNavigationOpen && (
         <NavigationModal
           onSubmit={async ({ rated }) => {
-            await window.ipcRenderer.invoke("modal", false);
-            ratedNavigation(currentR.current!, rated);
-            window.ipcRenderer.send("modal:close:path", currentR.current!);
             closeModalNavigation();
+            ratedNavigation("", rated);
+
+            window.ipcRenderer.send("modal:navigation:close");
           }}
         />
       )}
       {isModalComplex && (
         <ComplexModal
           onSubmit={async ({ rated }) => {
-            await window.ipcRenderer.invoke("modal", false);
-            setComplex(rated);
             closeModalComplex();
+            setComplex(rated);
             nextView();
+
+            window.ipcRenderer.send("modal:state", false);
           }}
         />
       )}
