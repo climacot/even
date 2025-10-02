@@ -144,6 +144,7 @@ function createWindow() {
 
   web.webContents.on("will-navigate", (event, url) => {
     if (url.startsWith("https://www.google.com")) return;
+    html.webContents.send("url:change", url);
     if (visitedUrls.has(url)) return;
     event.preventDefault();
     shouldNavigate = true;
@@ -155,6 +156,7 @@ function createWindow() {
 
   web.webContents.on("did-navigate-in-page", (_, url) => {
     if (url.startsWith("https://www.google.com")) return;
+    html.webContents.send("url:change", url);
     if (visitedUrls.has(url)) return;
     shouldNavigate = false;
     lastBlockedUrl = url;

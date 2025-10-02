@@ -2,68 +2,92 @@ import { Button } from "@/components/button";
 import { Controller, useForm } from "react-hook-form";
 import { Likert } from "@/components/likert";
 import { Modal } from "@/components/modal";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useModal } from "@/hooks/use-modal";
 import { useStore } from "@/hooks/use-store";
 import WebIcon from "@/components/icons/web";
+import clsx from "clsx";
 
-const NavigationModal = ({
+const NavigationForm = ({
   onSubmit,
+  variant,
+  rated,
 }: {
   onSubmit: ({ rated }: { rated: string }) => void;
+  variant: "vertical" | "horizontal";
+  rated?: string;
 }) => {
   const form = useForm<{ rated?: string }>({
-    defaultValues: {
-      rated: undefined,
+    values: {
+      rated,
     },
   });
 
   return (
-    <Modal>
-      <form
-        className="p-8 flex flex-col gap-4"
-        onSubmit={form.handleSubmit(({ rated }) => {
-          onSubmit({ rated: rated! });
-        })}
-      >
+    <form
+      className={clsx(
+        variant === "vertical"
+          ? "p-8 flex flex-col gap-4"
+          : variant === "horizontal"
+          ? "flex flex-col gap-4"
+          : ""
+      )}
+      onSubmit={form.handleSubmit(({ rated }) => {
+        onSubmit({ rated: rated! });
+      })}
+    >
+      {variant === "vertical" && (
         <div>
           <div className="text-lg font-bold">
             Clasificación del resultado anterior
           </div>
           <div>Clasifique en base a la siguiente escala</div>
         </div>
-        <Controller
-          control={form.control}
-          rules={{ required: true }}
-          name="rated"
-          render={({ field: { onChange } }) => {
-            return (
-              <Likert
-                label="¿Qué tan confiado se encuentra en que encontrará un datataset?"
-                onChange={(value) => onChange(value)}
-                variant="vertical"
-                values={["1", "2", "3", "4", "5"]}
-                labels={[
-                  "El enlace estaba roto o no tenía nada que ver con los términos de búsqueda.",
-                  "Los términos de búsqueda se incluyeron en la página, pero no eran relevantes para la búsqueda.",
-                  "Era relevante para la búsqueda, pero no era tan interesante en relación con lo que buscaba.",
-                  "Es interesante y, en general, parece coincidir con los términos de búsqueda.",
-                  "Es exactamente lo que buscaba.",
-                ]}
-              />
-            );
-          }}
-        />
-        <Button
-          disabled={!form.formState.isValid}
-          variant="solid"
-          color="blue"
-          type="submit"
-        >
-          Enviar clasificación
-        </Button>
-      </form>
-    </Modal>
+      )}
+      <Controller
+        control={form.control}
+        rules={{ required: true }}
+        name="rated"
+        render={({ field: { value, onChange } }) => {
+          return (
+            <Likert
+              value={value}
+              onChange={onChange}
+              variant={variant}
+              values={["1", "2", "3", "4", "5"]}
+              labels={
+                variant === "vertical"
+                  ? [
+                      "El enlace estaba roto o no tenía nada que ver con los términos de búsqueda.",
+                      "Los términos de búsqueda se incluyeron en la página, pero no eran relevantes para la búsqueda.",
+                      "Era relevante para la búsqueda, pero no era tan interesante en relación con lo que buscaba.",
+                      "Es interesante y, en general, parece coincidir con los términos de búsqueda.",
+                      "Es exactamente lo que buscaba.",
+                    ]
+                  : variant === "horizontal"
+                  ? ["no lo es", "neutral", "es exactamente"]
+                  : []
+              }
+              label={
+                variant === "vertical"
+                  ? "¿Qué tan confiado se encuentra en que encontrará un datataset?"
+                  : variant === "horizontal"
+                  ? "¿Es lo que buscaba?"
+                  : ""
+              }
+            />
+          );
+        }}
+      />
+      <Button
+        disabled={!form.formState.isValid}
+        variant="solid"
+        color="blue"
+        type="submit"
+      >
+        Enviar clasificación
+      </Button>
+    </form>
   );
 };
 
@@ -122,8 +146,17 @@ const ComplexModal = ({
 };
 
 export const View3 = () => {
-  const { resources, addResource, ratedNavigation, setComplex, nextView } =
-    useStore();
+  const [url, setUrl] = useState<string>();
+
+  const {
+    resources,
+    navigation,
+    addResource,
+    addNavigation,
+    ratedNavigation,
+    setComplex,
+    nextView,
+  } = useStore();
 
   const {
     isOpen: isModalNavigationOpen,
@@ -159,18 +192,31 @@ export const View3 = () => {
   // }, []);
 
   useEffect(() => {
-    const channel = "modal:navigation:open";
+    const channel1 = "modal:navigation:open";
+    const channel2 = "url:change";
 
-    function func() {
-      openModalNavgation();
+    function func1(_: Electron.IpcRendererEvent, url: string) {
+      if (navigation.find(n => n.url === url)) return;
+      openModalNavgation(url);
+      addNavigation(url);
     }
 
-    window.ipcRenderer.on(channel, func);
+    function func2(_: Electron.IpcRendererEvent, url: string) {
+      setUrl(url);
+    }
+
+    window.ipcRenderer.on(channel1, func1);
+    window.ipcRenderer.on(channel2, func2);
 
     return () => {
-      window.ipcRenderer.off(channel, func);
+      window.ipcRenderer.off(channel1, func1);
+      window.ipcRenderer.off(channel2, func2);
     };
   }, []);
+
+  const alreadyNavigation = navigation.find(
+    (n) => n.url === url && n.isRated === true
+  );
 
   return (
     <>
@@ -187,14 +233,24 @@ export const View3 = () => {
           <label className="block text-sm font-medium mb-2 dark:text-white">
             Recurso actual
           </label>
-          <div className="py-2.5 px-4 block w-full border border-gray-200 rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
-            Se autocompletará cuando navegues por la web
+          <div className="break-all text-sm py-2.5 px-4 border border-gray-200 rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
+            {url ?? "Se autocompletará cuando navegues por la web"}
           </div>
         </div>
+        {alreadyNavigation && (
+          <NavigationForm
+            rated={alreadyNavigation.rated}
+            variant="horizontal"
+            onSubmit={({ rated }) =>
+              ratedNavigation(alreadyNavigation.url, rated)
+            }
+          />
+        )}
         <Button
           variant="soft"
           color="yellow"
-          onClick={() => addResource("Soy un recurso")}
+          disabled={resources.includes(url!) || !url}
+          onClick={() => addResource(url!)}
         >
           Seleccionar recurso
         </Button>
@@ -202,13 +258,15 @@ export const View3 = () => {
           <label className="block text-sm font-medium mb-2 dark:text-white">
             Recursos seleccionados
           </label>
-          <div className="py-2.5 px-4 block w-full border border-gray-200 rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
+          <div className="py-2.5 px-4 text-sm flex flex-col gap-2 border border-gray-200 rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
             {resources.length === 0
               ? "Aún no se ha seleccionado ningún recurso."
               : resources.map((rsc, index) => (
                   <div key={index} className="flex gap-4">
-                    <WebIcon />
-                    <span className="font-medium">{rsc}</span>
+                    <div>
+                      <WebIcon />
+                    </div>
+                    <span className="font-normal break-all">{rsc}</span>
                   </div>
                 ))}
           </div>
@@ -225,17 +283,20 @@ export const View3 = () => {
           Finalizar tarea 1
         </Button>
       </div>
-      {isModalNavigationOpen && (
-        <NavigationModal
-          onSubmit={async ({ rated }) => {
-            closeModalNavigation();
-            ratedNavigation("", rated);
+      {isModalNavigationOpen.isOpen && (
+        <Modal>
+          <NavigationForm
+            variant="vertical"
+            onSubmit={async ({ rated }) => {
+              closeModalNavigation();
+              ratedNavigation(isModalNavigationOpen.url!, rated);
 
-            window.ipcRenderer.send("modal:navigation:close");
-          }}
-        />
+              window.ipcRenderer.send("modal:navigation:close");
+            }}
+          />
+        </Modal>
       )}
-      {isModalComplex && (
+      {isModalComplex.isOpen && (
         <ComplexModal
           onSubmit={async ({ rated }) => {
             closeModalComplex();

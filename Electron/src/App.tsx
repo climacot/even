@@ -8,7 +8,7 @@ export const App = () => {
   const { currentView } = useStore();
 
   return (
-    <div className="h-screen w-[400px] border-r border-gray-200 bg-white">
+    <div className="h-screen w-[400px] max-w-[400px] overflow-x-hidden border-r border-gray-200 bg-white">
       {currentView === 1 ? (
         <View1 />
       ) : currentView === 2 ? (

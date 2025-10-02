@@ -6,30 +6,33 @@ export const Likert = ({
   labels,
   onChange,
   variant,
+  value,
 }: {
   label: string;
   values: string[];
   labels: string[];
   onChange: (value: string) => void;
   variant: "vertical" | "horizontal";
+  value?: string;
 }) => {
   const id = useId();
 
   return variant === "vertical" ? (
     <ul className="max-w-sm flex flex-col">
-      {values.map((value, index) => (
+      {values.map((v, index) => (
         <li
-          key={value}
+          key={v}
           className="inline-flex items-center text-sm font-medium bg-white border border-gray-200 text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-800 dark:border-neutral-700 dark:text-white"
         >
           <label
-            htmlFor={`${id}-${value}`}
+            htmlFor={`${id}-${v}`}
             className="relative flex items-start w-full gap-x-2 py-3 px-4 cursor-pointer"
           >
             <div className="flex items-center h-5">
               <input
-                value={value}
-                id={`${id}-${value}`}
+                checked={value ? value === v : undefined}
+                value={v}
+                id={`${id}-${v}`}
                 name={id}
                 type="radio"
                 className="cursor-pointer border-gray-200 rounded-full disabled:opacity-50 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
@@ -37,7 +40,7 @@ export const Likert = ({
               />
             </div>
             <span className="ms-3 block w-full text-sm text-gray-600 dark:text-neutral-500">
-              {value} - {labels[index]}
+              {v} - {labels[index]}
             </span>
           </label>
         </li>
@@ -50,22 +53,23 @@ export const Likert = ({
       </label>
       <div className="rounded-md border border-gray-200">
         <div className="flex">
-          {values.map((value) => (
+          {values.map((v) => (
             <label
               className="flex flex-1 justify-center p-4 cursor-pointer"
-              htmlFor={`${id}-${value}`}
-              key={value}
+              htmlFor={`${id}-${v}`}
+              key={v}
             >
               <input
+                checked={value ? value === v : undefined}
                 type="radio"
                 name={id}
                 className="cursor-pointer shrink-0 mt-0.5 border-gray-200 rounded-full text-blue-600 focus:ring-blue-500 checked:border-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800"
-                id={`${id}-${value}`}
+                id={`${id}-${v}`}
                 onChange={(event) => onChange(event.target.value)}
-                value={value}
+                value={v}
               />
               <span className="text-sm text-gray-500 ms-2 dark:text-neutral-400">
-                {value}
+                {v}
               </span>
             </label>
           ))}
