@@ -25,6 +25,8 @@ type State = {
   complex?: string;
   setComplex: (rated: string) => void;
   reset: () => void;
+  currentUrl?: string;
+  setCurrentUrl: (url?: string) => void;
 };
 
 export const useStore = create<State>((set) => ({
@@ -68,4 +70,6 @@ export const useStore = create<State>((set) => ({
       navigation: [],
     });
   },
+  currentUrl: undefined,
+  setCurrentUrl: (url) => set({ currentUrl: url }),
 }));

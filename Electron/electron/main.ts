@@ -31,10 +31,8 @@ const INITIAL_BROWSER_URL = common.initialWeb;
 
 // ------------------------- VARIABLES -------------------------
 
-let lastBlockedUrl: string | null = null;
 let isModalOpen: boolean = false;
-let shouldNavigate: boolean | null;
-const visitedUrls = new Set<string>();
+let lastUrl: string | undefined;
 
 // ------------------------- DISABLE BOTS ----------------------
 
@@ -60,6 +58,7 @@ function createWindow() {
 
   const web = new WebContentsView();
 
+  web.webContents.setUserAgent(USER_AGENT);
   web.webContents.loadURL(INITIAL_BROWSER_URL, { userAgent: USER_AGENT });
   win.contentView.addChildView(web, 0);
 
@@ -92,7 +91,7 @@ function createWindow() {
     },
   });
 
-  // html.webContents.openDevTools({ mode: "undocked" });
+  html.webContents.openDevTools({ mode: "undocked" });
 
   if (VITE_DEV_SERVER_URL) {
     html.webContents.loadURL(VITE_DEV_SERVER_URL);
@@ -142,44 +141,33 @@ function createWindow() {
 
   // -------------------- MODAL ----------------------------------
 
-  web.webContents.on("will-navigate", (event, url) => {
-    if (url.startsWith("https://www.google.com")) return;
+  web.webContents.on("did-navigate", (_, url) => {
+    if (lastUrl === url) return;
+
+    lastUrl = url;
+
     html.webContents.send("url:change", url);
-    if (visitedUrls.has(url)) return;
-    event.preventDefault();
-    shouldNavigate = true;
-    lastBlockedUrl = url;
-    isModalOpen = true;
-    resizeViews();
-    html.webContents.send("modal:navigation:open", url);
   });
 
   web.webContents.on("did-navigate-in-page", (_, url) => {
-    if (url.startsWith("https://www.google.com")) return;
+    if (lastUrl === url) return;
+
+    lastUrl = url;
+
     html.webContents.send("url:change", url);
-    if (visitedUrls.has(url)) return;
-    shouldNavigate = false;
-    lastBlockedUrl = url;
-    isModalOpen = true;
-    resizeViews();
-    html.webContents.send("modal:navigation:open", url);
   });
 
-  ipcMain.on("modal:navigation:close", () => {
-    if (!lastBlockedUrl) return;
-    isModalOpen = false;
-    resizeViews();
-    shouldNavigate === true && web.webContents.loadURL(lastBlockedUrl);
-    visitedUrls.add(lastBlockedUrl);
-    lastBlockedUrl = null;
-  });
-
-  ipcMain.on("modal:state", (_, isOpen) => {
+  ipcMain.on("modal", (_, isOpen) => {
     isModalOpen = isOpen;
     resizeViews();
   });
 
   // -------------------- NAVEGACION ------------------------------
+
+  web.webContents.setWindowOpenHandler(({ url }) => {
+    web.webContents.loadURL(url);
+    return { action: "deny" };
+  });
 
   web.webContents.on("did-start-loading", () => {
     navigation.webContents.send("browser:loading", true);

@@ -2,48 +2,35 @@ import { Button } from "@/components/button";
 import { Controller, useForm } from "react-hook-form";
 import { Likert } from "@/components/likert";
 import { Modal } from "@/components/modal";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useModal } from "@/hooks/use-modal";
 import { useStore } from "@/hooks/use-store";
 import WebIcon from "@/components/icons/web";
-import clsx from "clsx";
 
 const NavigationForm = ({
   onSubmit,
-  variant,
-  rated,
 }: {
   onSubmit: ({ rated }: { rated: string }) => void;
-  variant: "vertical" | "horizontal";
-  rated?: string;
 }) => {
   const form = useForm<{ rated?: string }>({
-    values: {
-      rated,
+    defaultValues: {
+      rated: undefined,
     },
   });
 
   return (
     <form
-      className={clsx(
-        variant === "vertical"
-          ? "p-8 flex flex-col gap-4"
-          : variant === "horizontal"
-          ? "flex flex-col gap-4"
-          : ""
-      )}
+      className="p-8 flex flex-col gap-4"
       onSubmit={form.handleSubmit(({ rated }) => {
         onSubmit({ rated: rated! });
       })}
     >
-      {variant === "vertical" && (
-        <div>
-          <div className="text-lg font-bold">
-            Clasificación del resultado anterior
-          </div>
-          <div>Clasifique en base a la siguiente escala</div>
+      <div>
+        <div className="text-lg font-bold">
+          Clasificación del resultado anterior
         </div>
-      )}
+        <div>Clasifique en base a la siguiente escala</div>
+      </div>
       <Controller
         control={form.control}
         rules={{ required: true }}
@@ -53,28 +40,16 @@ const NavigationForm = ({
             <Likert
               value={value}
               onChange={onChange}
-              variant={variant}
+              variant="vertical"
               values={["1", "2", "3", "4", "5"]}
-              labels={
-                variant === "vertical"
-                  ? [
-                      "El enlace estaba roto o no tenía nada que ver con los términos de búsqueda.",
-                      "Los términos de búsqueda se incluyeron en la página, pero no eran relevantes para la búsqueda.",
-                      "Era relevante para la búsqueda, pero no era tan interesante en relación con lo que buscaba.",
-                      "Es interesante y, en general, parece coincidir con los términos de búsqueda.",
-                      "Es exactamente lo que buscaba.",
-                    ]
-                  : variant === "horizontal"
-                  ? ["no lo es", "neutral", "es exactamente"]
-                  : []
-              }
-              label={
-                variant === "vertical"
-                  ? "¿Qué tan confiado se encuentra en que encontrará un datataset?"
-                  : variant === "horizontal"
-                  ? "¿Es lo que buscaba?"
-                  : ""
-              }
+              label="¿Qué tan confiado se encuentra en que encontrará un datataset?"
+              labels={[
+                "El enlace estaba roto o no tenía nada que ver con los términos de búsqueda.",
+                "Los términos de búsqueda se incluyeron en la página, pero no eran relevantes para la búsqueda.",
+                "Era relevante para la búsqueda, pero no era tan interesante en relación con lo que buscaba.",
+                "Es interesante y, en general, parece coincidir con los términos de búsqueda.",
+                "Es exactamente lo que buscaba.",
+              ]}
             />
           );
         }}
@@ -103,57 +78,54 @@ const ComplexModal = ({
   });
 
   return (
-    <Modal>
-      <form
-        className="p-8 flex flex-col gap-4"
-        onSubmit={form.handleSubmit(({ rated }) => {
-          onSubmit({ rated: rated! });
-        })}
-      >
-        <div>
-          <div className="text-lg font-bold">
-            Clasificación complejidad tarea 1
-          </div>
-          <div>Clasifique en base a la siguiente escala</div>
+    <form
+      className="p-8 flex flex-col gap-4"
+      onSubmit={form.handleSubmit(({ rated }) => {
+        onSubmit({ rated: rated! });
+      })}
+    >
+      <div>
+        <div className="text-lg font-bold">
+          Clasificación complejidad tarea 1
         </div>
-        <Controller
-          control={form.control}
-          name="rated"
-          rules={{ required: true }}
-          render={({ field: { onChange } }) => {
-            return (
-              <Likert
-                label="¿Qué tan confiado se encuentra en que encontrará un datataset?"
-                onChange={(value) => onChange(value)}
-                variant="horizontal"
-                values={["1", "2", "3", "4", "5"]}
-                labels={["fácil", "neutral", "compleja"]}
-              />
-            );
-          }}
-        />
-        <Button
-          disabled={!form.formState.isValid}
-          variant="solid"
-          color="blue"
-          type="submit"
-        >
-          Enviar clasificación
-        </Button>
-      </form>
-    </Modal>
+        <div>Clasifique en base a la siguiente escala</div>
+      </div>
+      <Controller
+        control={form.control}
+        name="rated"
+        rules={{ required: true }}
+        render={({ field: { onChange } }) => {
+          return (
+            <Likert
+              label="¿Qué tan confiado se encuentra en que encontrará un datataset?"
+              onChange={(value) => onChange(value)}
+              variant="horizontal"
+              values={["1", "2", "3", "4", "5"]}
+              labels={["fácil", "neutral", "compleja"]}
+            />
+          );
+        }}
+      />
+      <Button
+        disabled={!form.formState.isValid}
+        variant="solid"
+        color="blue"
+        type="submit"
+      >
+        Enviar clasificación
+      </Button>
+    </form>
   );
 };
 
 export const View3 = () => {
-  const [url, setUrl] = useState<string>();
-
   const {
     resources,
     navigation,
+    currentUrl,
     addResource,
-    addNavigation,
     ratedNavigation,
+    setCurrentUrl,
     setComplex,
     nextView,
   } = useStore();
@@ -170,53 +142,32 @@ export const View3 = () => {
     closeModal: closeModalComplex,
   } = useModal();
 
-  // useEffect(() => {
-  //   async function handler(_: any, path: string) {
-  //     if (path.startsWith("https://www.google.com")) return;
-  //     const { navigation, addNavigation } = useStore.getState();
-  //     const current = navigation.find((value) => value.url === path);
-  //     if (!current) addNavigation(path);
-  //     if (navigation.length === 0) return;
-  //     const previous = navigation.at(-2)!;
-  //     if (previous.isRated) return;
-  //     previousR.current = previous.url;
-  //     await window.ipcRenderer.invoke("modal", true);
-  //     openModalNavgation();
-  //   }
-
-  //   window.ipcRenderer.on("browser:path:change", handler);
-
-  //   return () => {
-  //     window.ipcRenderer.off("browser:path:change", handler);
-  //   };
-  // }, []);
-
   useEffect(() => {
-    const channel1 = "modal:navigation:open";
-    const channel2 = "url:change";
+    function func(_: Electron.IpcRendererEvent, url: string) {
+      if (url.startsWith("https://www.google.com")) return;
 
-    function func1(_: Electron.IpcRendererEvent, url: string) {
-      if (navigation.find(n => n.url === url)) return;
-      openModalNavgation(url);
+      const { navigation, addNavigation } = useStore.getState();
+
+      if (navigation.find((n) => n.url === url)) return;
+
       addNavigation(url);
+
+      window.ipcRenderer.send("modal", true);
+
+      setCurrentUrl(url);
+      openModalNavgation();
     }
 
-    function func2(_: Electron.IpcRendererEvent, url: string) {
-      setUrl(url);
-    }
-
-    window.ipcRenderer.on(channel1, func1);
-    window.ipcRenderer.on(channel2, func2);
+    window.ipcRenderer.on("url:change", func);
 
     return () => {
-      window.ipcRenderer.off(channel1, func1);
-      window.ipcRenderer.off(channel2, func2);
+      window.ipcRenderer.off("url:change", func);
     };
   }, []);
 
-  const alreadyNavigation = navigation.find(
-    (n) => n.url === url && n.isRated === true
-  );
+  const alreadyNavigation = navigation.find((n) => {
+    return n.url === currentUrl && n.isRated === true;
+  });
 
   return (
     <>
@@ -234,23 +185,26 @@ export const View3 = () => {
             Recurso actual
           </label>
           <div className="break-all text-sm py-2.5 px-4 border border-gray-200 rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
-            {url ?? "Se autocompletará cuando navegues por la web"}
+            {currentUrl ?? "Se autocompletará cuando navegues por la web"}
           </div>
         </div>
         {alreadyNavigation && (
-          <NavigationForm
-            rated={alreadyNavigation.rated}
-            variant="horizontal"
-            onSubmit={({ rated }) =>
-              ratedNavigation(alreadyNavigation.url, rated)
-            }
+          <Likert
+            variant={"horizontal"}
+            values={["1", "2", "3", "4", "5"]}
+            labels={["no lo es", "neutral", "es exactamente"]}
+            label={"¿Es lo que buscaba?"}
+            value={alreadyNavigation.rated}
+            onChange={(rated) => {
+              ratedNavigation(alreadyNavigation.url, rated);
+            }}
           />
         )}
         <Button
           variant="soft"
           color="yellow"
-          disabled={resources.includes(url!) || !url}
-          onClick={() => addResource(url!)}
+          disabled={resources.includes(currentUrl!) || !currentUrl}
+          onClick={() => addResource(currentUrl!)}
         >
           Seleccionar recurso
         </Button>
@@ -275,37 +229,38 @@ export const View3 = () => {
           variant="solid"
           color="blue"
           onClick={async () => {
-            openModalComplex();
+            window.ipcRenderer.send("modal", true);
 
-            window.ipcRenderer.send("modal:state", true);
+            openModalComplex();
           }}
         >
           Finalizar tarea 1
         </Button>
       </div>
-      {isModalNavigationOpen.isOpen && (
+      {isModalNavigationOpen && (
         <Modal>
           <NavigationForm
-            variant="vertical"
             onSubmit={async ({ rated }) => {
+              ratedNavigation(currentUrl!, rated);
               closeModalNavigation();
-              ratedNavigation(isModalNavigationOpen.url!, rated);
 
-              window.ipcRenderer.send("modal:navigation:close");
+              window.ipcRenderer.send("modal", false);
             }}
           />
         </Modal>
       )}
-      {isModalComplex.isOpen && (
-        <ComplexModal
-          onSubmit={async ({ rated }) => {
-            closeModalComplex();
-            setComplex(rated);
-            nextView();
+      {isModalComplex && (
+        <Modal>
+          <ComplexModal
+            onSubmit={async ({ rated }) => {
+              setComplex(rated);
+              closeModalComplex();
+              nextView();
 
-            window.ipcRenderer.send("modal:state", false);
-          }}
-        />
+              window.ipcRenderer.send("modal", false);
+            }}
+          />
+        </Modal>
       )}
     </>
   );

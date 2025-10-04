@@ -22,15 +22,14 @@ export const Likert = ({
       {values.map((v, index) => (
         <li
           key={v}
-          className="inline-flex items-center text-sm font-medium bg-white border border-gray-200 text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-800 dark:border-neutral-700 dark:text-white"
+          className="hover:bg-gray-100 select-none inline-flex items-center text-sm font-medium bg-white border border-gray-200 text-gray-800 -mt-px first:rounded-t-lg first:mt-0 last:rounded-b-lg dark:bg-neutral-800 dark:border-neutral-700 dark:text-white"
         >
           <label
             htmlFor={`${id}-${v}`}
             className="relative flex items-start w-full gap-x-2 py-3 px-4 cursor-pointer"
           >
             <div className="flex items-center h-5">
-              <input
-                checked={value ? value === v : undefined}
+              <input                
                 value={v}
                 id={`${id}-${v}`}
                 name={id}
@@ -55,7 +54,7 @@ export const Likert = ({
         <div className="flex">
           {values.map((v) => (
             <label
-              className="flex flex-1 justify-center p-4 cursor-pointer"
+              className="hover:bg-gray-100 select-none flex flex-1 justify-center p-4 cursor-pointer"
               htmlFor={`${id}-${v}`}
               key={v}
             >
