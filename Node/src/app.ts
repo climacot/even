@@ -1,6 +1,6 @@
+import { errorHandler } from "./middlewares/middlewares";
 import express from "express";
 import routes from "./routes/routes";
-import { errorHandler } from "./middlewares/middlewares";
 
 const app = express();
 

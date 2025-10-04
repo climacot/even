@@ -2,10 +2,10 @@
   "name": "node",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/server.ts",
     "dev": "nodemon --watch 'src/**/*.ts' --exec npx ts-node src/server.ts",
     "lint": "eslint 'src/**/*.ts'"
   },
@@ -15,6 +15,7 @@
   "type": "commonjs",
   "devDependencies": {
     "@types/express": "^5.0.3",
+    "@types/jsdom": "^27.0.0",
     "@types/node": "^24.0.14",
     "dotenv": "^17.2.0",
     "eslint": "^9.31.0",
@@ -25,5 +26,9 @@
     "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "cheerio": "^1.1.2",
+    "jsdom": "^27.0.0"
   }
 }
