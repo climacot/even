@@ -1,6 +1,7 @@
 import { Button } from "@/components/button";
 import { Input } from "@/components/input";
 import { useStore } from "@/hooks/use-store";
+// import { supabase } from "@/services/services";
 import { useForm, Controller } from "react-hook-form";
 
 export const View1 = () => {
@@ -15,7 +16,9 @@ export const View1 = () => {
   return (
     <form
       className="p-4 flex flex-col gap-4"
-      onSubmit={form.handleSubmit(({ fullName }) => {
+      onSubmit={form.handleSubmit(async ({ fullName }) => {
+        // await supabase.auth.signInAnonymously();
+
         setFullName(fullName);
         nextView();
       })}
@@ -23,8 +26,8 @@ export const View1 = () => {
       <div className="font-bold text-2xl">SFE3000</div>
       <h1>Bienvenid@ a EVAEN</h1>
       <p>
-        Gracias por participar en esta prueba, antes de continuar por favor
-        complete esta información:
+        Gracias por participar en esta prueba, antes de continuar por favor complete esta
+        información:
       </p>
       <Controller
         name="fullName"

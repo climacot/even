@@ -33,6 +33,8 @@ type State = {
   reset: () => void;
   currentUrl?: string;
   setCurrentUrl: (url?: string) => void;
+  prevUrl?: string;
+  setPrevUrl: (url?: string) => void;
   taskTimeStart?: number;
   taskTimeEnd?: number;
   setTaskTimeStart: () => void;
@@ -82,6 +84,8 @@ export const useStore = create<State>((set) => ({
   },
   currentUrl: undefined,
   setCurrentUrl: (url) => set({ currentUrl: url }),
+  prevUrl: undefined,
+  setPrevUrl: (url) => set({ prevUrl: url }),
   taskTimeStart: undefined,
   taskTimeEnd: undefined,
   setTaskTimeStart: () => set({ taskTimeStart: Date.now() }),

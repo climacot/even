@@ -97,7 +97,7 @@ function createWindow() {
     },
   });
 
-  html.webContents.openDevTools({ mode: "undocked" });
+  // html.webContents.openDevTools({ mode: "undocked" });
 
   if (VITE_DEV_SERVER_URL) {
     html.webContents.loadURL(VITE_DEV_SERVER_URL);
@@ -170,18 +170,18 @@ function createWindow() {
 
   // -------------------- CAPTURAS --------------------------------
 
-  web.webContents.on("did-finish-load", () => {
-    web.webContents.executeJavaScript(`
-      (function() {
-        document.addEventListener("click", (e) => {
-          const tag = e.target.tagName.toLowerCase();
-          window.ipcRenderer.send("counter:clicks", tag);
-        });
-      })();
-    `);
-  });
+  // web.webContents.on("did-finish-load", () => {
+  //   web.webContents.executeJavaScript(`
+  //     (function() {
+  //       document.addEventListener("click", (e) => {
+  //         const tag = e.target.tagName.toLowerCase();
+  //         window.ipcRenderer.send("counter:clicks", tag);
+  //       });
+  //     })();
+  //   `);
+  // });
 
-  ipcMain.on("counter:clicks", () => {});
+  // ipcMain.on("counter:clicks", () => {});
 
   // -------------------- NAVEGACION ------------------------------
 

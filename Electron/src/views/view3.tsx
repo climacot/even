@@ -116,6 +116,7 @@ const ComplexModal = ({
 
 export const View3 = () => {
   const {
+    prevUrl,
     resources,
     navigation,
     currentUrl,
@@ -124,6 +125,7 @@ export const View3 = () => {
     setTaskTimeEnd,
     setCurrentUrl,
     setComplex,
+    setPrevUrl,
     nextView,
   } = useStore();
 
@@ -144,6 +146,7 @@ export const View3 = () => {
       console.log({ prevUrl, url });
 
       setCurrentUrl(url);
+      setPrevUrl(prevUrl);
 
       if (url.startsWith("https://www.google.com")) return;
       if (prevUrl.startsWith("https://www.google.com")) return;
@@ -241,7 +244,7 @@ export const View3 = () => {
         <Modal>
           <NavigationForm
             onSubmit={async ({ rated }) => {
-              ratedNavigation(currentUrl!, rated);
+              ratedNavigation(prevUrl!, rated);
               closeModalNavigation();
 
               await window.ipcRenderer.invoke("modal", false);
