@@ -140,7 +140,9 @@ export const View3 = () => {
   } = useModal();
 
   useEffect(() => {
-    function func(_: Electron.IpcRendererEvent, prevUrl: string, url: string) {
+    window.ipcRenderer.on("url:change", (_, prevUrl: string, url: string) => {
+      console.log({ prevUrl, url });
+
       setCurrentUrl(url);
 
       if (url.startsWith("https://www.google.com")) return;
@@ -154,12 +156,10 @@ export const View3 = () => {
 
       addNavigation(url);
       openModalNavgation();
-    }
-
-    window.ipcRenderer.on("url:change", func);
+    });
 
     return () => {
-      window.ipcRenderer.off("url:change", func);
+      window.ipcRenderer.removeAllListeners("url:change");
     };
   }, []);
 
