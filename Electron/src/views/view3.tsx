@@ -26,9 +26,7 @@ const NavigationForm = ({
       })}
     >
       <div>
-        <div className="text-lg font-bold">
-          Clasificación del resultado anterior
-        </div>
+        <div className="text-lg font-bold">Clasificación del resultado anterior</div>
         <div>Clasifique en base a la siguiente escala</div>
       </div>
       <Controller
@@ -85,9 +83,7 @@ const ComplexModal = ({
       })}
     >
       <div>
-        <div className="text-lg font-bold">
-          Clasificación complejidad tarea 1
-        </div>
+        <div className="text-lg font-bold">Clasificación complejidad tarea 1</div>
         <div>Clasifique en base a la siguiente escala</div>
       </div>
       <Controller
@@ -125,6 +121,7 @@ export const View3 = () => {
     currentUrl,
     addResource,
     ratedNavigation,
+    setTaskTimeEnd,
     setCurrentUrl,
     setComplex,
     nextView,
@@ -144,17 +141,17 @@ export const View3 = () => {
 
   useEffect(() => {
     function func(_: Electron.IpcRendererEvent, url: string) {
+      setCurrentUrl(url);
+
       if (url.startsWith("https://www.google.com")) return;
 
       const { navigation, addNavigation } = useStore.getState();
 
       if (navigation.find((n) => n.url === url)) return;
 
-      addNavigation(url);
-
       window.ipcRenderer.send("modal", true);
 
-      setCurrentUrl(url);
+      addNavigation(url);
       openModalNavgation();
     }
 
@@ -169,16 +166,17 @@ export const View3 = () => {
     return n.url === currentUrl && n.isRated === true;
   });
 
+  const isDisabled = Boolean(resources.find((r) => r.url === currentUrl)) || !currentUrl;
+
   return (
     <>
       <div className="p-4 flex flex-col gap-4">
         <div className="font-bold text-2xl">SFE3000</div>
         <div>Tarea 1/1</div>
         <p>
-          Imagina que trabajas en un proyecto de clase sobre inteligencia
-          artificial aplicado a la salud. Tu tarea es encontrar un dataset
-          confiable que contenga información sobre enfermedades o condiciones de
-          salud.
+          Imagina que trabajas en un proyecto de clase sobre inteligencia artificial
+          aplicado a la salud. Tu tarea es encontrar un dataset confiable que contenga
+          información sobre enfermedades o condiciones de salud.
         </p>
         <div>
           <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -203,7 +201,7 @@ export const View3 = () => {
         <Button
           variant="soft"
           color="yellow"
-          disabled={resources.includes(currentUrl!) || !currentUrl}
+          disabled={isDisabled}
           onClick={() => addResource(currentUrl!)}
         >
           Seleccionar recurso
@@ -220,7 +218,7 @@ export const View3 = () => {
                     <div>
                       <WebIcon />
                     </div>
-                    <span className="font-normal break-all">{rsc}</span>
+                    <span className="font-normal break-all">{rsc.url}</span>
                   </div>
                 ))}
           </div>
@@ -231,6 +229,7 @@ export const View3 = () => {
           onClick={async () => {
             window.ipcRenderer.send("modal", true);
 
+            setTaskTimeEnd();
             openModalComplex();
           }}
         >

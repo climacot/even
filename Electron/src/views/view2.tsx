@@ -9,7 +9,7 @@ type State = {
 };
 
 export const View2 = () => {
-  const { nextView, setExperience, setFeeling } = useStore();
+  const { nextView, setExperience, setFeeling, setTaskTimeStart } = useStore();
 
   const form = useForm<State>({
     defaultValues: {
@@ -22,6 +22,7 @@ export const View2 = () => {
     <form
       className="p-4 flex flex-col gap-4"
       onSubmit={form.handleSubmit(({ experience, feeling }) => {
+        setTaskTimeStart();
         setExperience(experience!);
         setFeeling(feeling!);
         nextView();
@@ -30,10 +31,9 @@ export const View2 = () => {
       <div className="font-bold text-2xl">SFE3000</div>
       <div>Tarea 1/1</div>
       <p>
-        Imagine que trabaja en un proyecto de clase sobre inteligencia
-        artificial aplicado a la salud. Su tarea es encontrar un dataset
-        confiable que contenga información sobre enfermedades o condiciones de
-        salud.
+        Imagine que trabaja en un proyecto de clase sobre inteligencia artificial aplicado
+        a la salud. Su tarea es encontrar un dataset confiable que contenga información
+        sobre enfermedades o condiciones de salud.
       </p>
       <Controller
         name="experience"

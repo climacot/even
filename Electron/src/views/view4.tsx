@@ -8,6 +8,8 @@ export const View4 = () => {
     feeling,
     resources,
     navigation,
+    taskTimeStart,
+    taskTimeEnd,
     complex,
     reset,
   } = useStore();
@@ -24,6 +26,8 @@ export const View4 = () => {
           resources,
           navigation,
           complex,
+          taskTimeStart,
+          taskTimeEnd,
         })}
       </div>
       <Button
@@ -31,6 +35,8 @@ export const View4 = () => {
         variant="solid"
         onClick={() => {
           reset();
+
+          window.ipcRenderer.send("go-home");
         }}
       >
         Regresar al inicio

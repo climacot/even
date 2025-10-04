@@ -2,8 +2,14 @@ import { create } from "zustand";
 
 type Navigation = {
   url: string;
+  time: number;
   isRated: boolean;
   rated?: string;
+};
+
+type Resource = {
+  url: string;
+  time: number;
 };
 
 type State = {
@@ -17,8 +23,8 @@ type State = {
   setExperience: (value: string) => void;
   feeling?: string;
   setFeeling: (value: string) => void;
-  resources: string[];
-  addResource: (value: string) => void;
+  resources: Resource[];
+  addResource: (url: string) => void;
   navigation: Navigation[];
   addNavigation: (url: string) => void;
   ratedNavigation: (url: string, rated: string) => void;
@@ -27,6 +33,10 @@ type State = {
   reset: () => void;
   currentUrl?: string;
   setCurrentUrl: (url?: string) => void;
+  taskTimeStart?: number;
+  taskTimeEnd?: number;
+  setTaskTimeStart: () => void;
+  setTaskTimeEnd: () => void;
 };
 
 export const useStore = create<State>((set) => ({
@@ -41,13 +51,13 @@ export const useStore = create<State>((set) => ({
   feeling: undefined,
   setFeeling: (value) => set({ feeling: value }),
   resources: [],
-  addResource: (value) => {
-    set((state) => ({ resources: [...state.resources, value] }));
+  addResource: (url) => {
+    set((state) => ({ resources: [...state.resources, { url, time: Date.now() }] }));
   },
   navigation: [],
   addNavigation: (value) => {
     set((state) => ({
-      navigation: [...state.navigation, { url: value, isRated: false }],
+      navigation: [...state.navigation, { url: value, isRated: false, time: Date.now() }],
     }));
   },
   ratedNavigation: (value, rated) => {
@@ -72,4 +82,8 @@ export const useStore = create<State>((set) => ({
   },
   currentUrl: undefined,
   setCurrentUrl: (url) => set({ currentUrl: url }),
+  taskTimeStart: undefined,
+  taskTimeEnd: undefined,
+  setTaskTimeStart: () => set({ taskTimeStart: Date.now() }),
+  setTaskTimeEnd: () => set({ taskTimeEnd: Date.now() }),
 }));

@@ -56,11 +56,17 @@ function createWindow() {
 
   // ----------------------- BROWSER WEB ------------------------
 
-  const web = new WebContentsView();
+  const web = new WebContentsView({
+    webPreferences: {
+      preload: path.join(__dirname, "preload.mjs"),
+    },
+  });
 
   web.webContents.setUserAgent(USER_AGENT);
   web.webContents.loadURL(INITIAL_BROWSER_URL, { userAgent: USER_AGENT });
   win.contentView.addChildView(web, 0);
+
+  // web.webContents.openDevTools({ mode: "undocked" });
 
   // ----------------------- NAVIGATION -------------------------
 
@@ -162,12 +168,27 @@ function createWindow() {
     resizeViews();
   });
 
+  // -------------------- CAPTURAS --------------------------------
+
+  web.webContents.on("did-finish-load", () => {
+    web.webContents.executeJavaScript(`
+      (function() {
+        document.addEventListener("click", (e) => {
+          const tag = e.target.tagName.toLowerCase();
+          window.ipcRenderer.send("counter:clicks", tag);
+        });
+      })();
+    `);
+  });
+
+  ipcMain.on("counter:clicks", () => {});
+
   // -------------------- NAVEGACION ------------------------------
 
   web.webContents.setWindowOpenHandler(({ url }) => {
     web.webContents.loadURL(url);
     return { action: "deny" };
-  });
+  });  
 
   web.webContents.on("did-start-loading", () => {
     navigation.webContents.send("browser:loading", true);
