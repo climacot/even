@@ -140,7 +140,7 @@ export const View3 = () => {
   } = useModal();
 
   useEffect(() => {
-    window.ipcRenderer.on("url:change", (_, prevUrl: string, url: string) => {
+    window.ipcRenderer.on("url:change", async (_, prevUrl: string, url: string) => {
       console.log({ prevUrl, url });
 
       setCurrentUrl(url);
@@ -152,7 +152,7 @@ export const View3 = () => {
 
       if (navigation.find((n) => n.url === url)) return;
 
-      window.ipcRenderer.send("modal", true);
+      await window.ipcRenderer.invoke("modal", true);
 
       addNavigation(url);
       openModalNavgation();
@@ -228,7 +228,7 @@ export const View3 = () => {
           variant="solid"
           color="blue"
           onClick={async () => {
-            window.ipcRenderer.send("modal", true);
+            await window.ipcRenderer.invoke("modal", true);
 
             setTaskTimeEnd();
             openModalComplex();
@@ -244,7 +244,7 @@ export const View3 = () => {
               ratedNavigation(currentUrl!, rated);
               closeModalNavigation();
 
-              window.ipcRenderer.send("modal", false);
+              await window.ipcRenderer.invoke("modal", false);
             }}
           />
         </Modal>
@@ -257,7 +257,7 @@ export const View3 = () => {
               closeModalComplex();
               nextView();
 
-              window.ipcRenderer.send("modal", false);
+              await window.ipcRenderer.invoke("modal", false);
             }}
           />
         </Modal>

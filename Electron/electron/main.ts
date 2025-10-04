@@ -47,6 +47,7 @@ function createWindow() {
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs"),
+      sandbox: true,
     },
   });
 
@@ -59,6 +60,7 @@ function createWindow() {
   const web = new WebContentsView({
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs"),
+      partition: "persist:google",
     },
   });
 
@@ -161,7 +163,7 @@ function createWindow() {
     lastUrl = url;
   });
 
-  ipcMain.on("modal", (_, isOpen) => {
+  ipcMain.handle("modal", (_, isOpen) => {
     isModalOpen = isOpen;
     resizeViews();
   });
