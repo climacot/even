@@ -79,9 +79,7 @@ function createWindow() {
   if (VITE_DEV_SERVER_URL) {
     navigation.webContents.loadURL(VITE_DEV_SERVER_URL + "navigation.html");
   } else {
-    navigation.webContents.loadFile(
-      path.join(RENDERER_DIST, "navigation.html")
-    );
+    navigation.webContents.loadFile(path.join(RENDERER_DIST, "navigation.html"));
   }
 
   // navigation.webContents.openDevTools({ mode: "undocked" });
@@ -150,17 +148,17 @@ function createWindow() {
   web.webContents.on("did-navigate", (_, url) => {
     if (lastUrl === url) return;
 
-    lastUrl = url;
+    html.webContents.send("url:change", lastUrl, url);
 
-    html.webContents.send("url:change", url);
+    lastUrl = url;
   });
 
   web.webContents.on("did-navigate-in-page", (_, url) => {
     if (lastUrl === url) return;
 
-    lastUrl = url;
+    html.webContents.send("url:change", lastUrl, url);
 
-    html.webContents.send("url:change", url);
+    lastUrl = url;
   });
 
   ipcMain.on("modal", (_, isOpen) => {
@@ -188,7 +186,7 @@ function createWindow() {
   web.webContents.setWindowOpenHandler(({ url }) => {
     web.webContents.loadURL(url);
     return { action: "deny" };
-  });  
+  });
 
   web.webContents.on("did-start-loading", () => {
     navigation.webContents.send("browser:loading", true);

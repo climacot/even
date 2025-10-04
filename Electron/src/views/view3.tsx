@@ -140,10 +140,11 @@ export const View3 = () => {
   } = useModal();
 
   useEffect(() => {
-    function func(_: Electron.IpcRendererEvent, url: string) {
+    function func(_: Electron.IpcRendererEvent, prevUrl: string, url: string) {
       setCurrentUrl(url);
 
       if (url.startsWith("https://www.google.com")) return;
+      if (prevUrl.startsWith("https://www.google.com")) return;
 
       const { navigation, addNavigation } = useStore.getState();
 
