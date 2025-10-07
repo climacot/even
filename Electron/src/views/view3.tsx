@@ -117,7 +117,6 @@ const ComplexModal = ({
 export const View3 = () => {
   const {
     prevUrl,
-    resources,
     navigation,
     currentUrl,
     addResource,
@@ -136,6 +135,12 @@ export const View3 = () => {
   } = useModal();
 
   const {
+    isOpen: isModalNavigationOpenEnd,
+    openModal: openModalNavgationEnd,
+    closeModal: closeModalNavigationEnd,
+  } = useModal();
+
+  const {
     isOpen: isModalComplex,
     openModal: openModalComplex,
     closeModal: closeModalComplex,
@@ -149,15 +154,17 @@ export const View3 = () => {
       setPrevUrl(prevUrl);
 
       if (url.startsWith("https://www.google.com")) return;
-      if (prevUrl.startsWith("https://www.google.com")) return;
 
       const { navigation, addNavigation } = useStore.getState();
 
       if (navigation.find((n) => n.url === url)) return;
 
+      addNavigation(url);
+
+      if (prevUrl.startsWith("https://www.google.com")) return;
+
       await window.ipcRenderer.invoke("modal", true);
 
-      addNavigation(url);
       openModalNavgation();
     });
 
@@ -170,6 +177,7 @@ export const View3 = () => {
     return n.url === currentUrl && n.isRated === true;
   });
 
+  const resources = navigation.filter((r) => r.isSelected === true);
   const isDisabled = Boolean(resources.find((r) => r.url === currentUrl)) || !currentUrl;
 
   return (
@@ -231,7 +239,15 @@ export const View3 = () => {
           variant="solid"
           color="blue"
           onClick={async () => {
+            // const currentNav = navigation.find((n) => n.url === currentUrl);
+
             await window.ipcRenderer.invoke("modal", true);
+
+            // if (!currentNav!.rated) {
+            //   openModalNavgationEnd();
+            // } else {
+
+            // }
 
             setTaskTimeEnd();
             openModalComplex();
@@ -240,6 +256,18 @@ export const View3 = () => {
           Finalizar tarea 1
         </Button>
       </div>
+      {isModalNavigationOpenEnd && (
+        <Modal>
+          <NavigationForm
+            onSubmit={async ({ rated }) => {
+              ratedNavigation(currentUrl!, rated);
+              closeModalNavigationEnd();
+
+              await window.ipcRenderer.invoke("modal", false);
+            }}
+          />
+        </Modal>
+      )}
       {isModalNavigationOpen && (
         <Modal>
           <NavigationForm

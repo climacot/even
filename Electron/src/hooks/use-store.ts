@@ -4,12 +4,9 @@ type Navigation = {
   url: string;
   time: number;
   isRated: boolean;
+  isSelected: boolean;
   rated?: string;
-};
-
-type Resource = {
-  url: string;
-  time: number;
+  selectTime?: number;
 };
 
 type State = {
@@ -23,7 +20,6 @@ type State = {
   setExperience: (value: string) => void;
   feeling?: string;
   setFeeling: (value: string) => void;
-  resources: Resource[];
   addResource: (url: string) => void;
   navigation: Navigation[];
   addNavigation: (url: string) => void;
@@ -39,6 +35,9 @@ type State = {
   taskTimeEnd?: number;
   setTaskTimeStart: () => void;
   setTaskTimeEnd: () => void;
+  sessionUid?: string;
+  setSessionUid: (sessionUid: string) => void;
+  removeSessionUid: () => void;
 };
 
 export const useStore = create<State>((set) => ({
@@ -53,13 +52,33 @@ export const useStore = create<State>((set) => ({
   feeling: undefined,
   setFeeling: (value) => set({ feeling: value }),
   resources: [],
-  addResource: (url) => {
-    set((state) => ({ resources: [...state.resources, { url, time: Date.now() }] }));
+  addResource: (value) => {
+    set((state) => ({
+      navigation: state.navigation.map((nav) => {
+        if (nav.url === value) {
+          return {
+            ...nav,
+            isSelected: true,
+            selectTime: Date.now(),
+          };
+        }
+
+        return nav;
+      }),
+    }));
   },
   navigation: [],
   addNavigation: (value) => {
     set((state) => ({
-      navigation: [...state.navigation, { url: value, isRated: false, time: Date.now() }],
+      navigation: [
+        ...state.navigation,
+        {
+          url: value,
+          isRated: false,
+          isSelected: false,
+          time: Date.now(),
+        },
+      ],
     }));
   },
   ratedNavigation: (value, rated) => {
@@ -78,8 +97,13 @@ export const useStore = create<State>((set) => ({
       fullName: undefined,
       experience: undefined,
       feeling: undefined,
-      resources: [],
       navigation: [],
+      complex: undefined,
+      currentUrl: undefined,
+      taskTimeEnd: undefined,
+      taskTimeStart: undefined,
+      prevUrl: undefined,
+      sessionUid: undefined,
     });
   },
   currentUrl: undefined,
@@ -90,4 +114,7 @@ export const useStore = create<State>((set) => ({
   taskTimeEnd: undefined,
   setTaskTimeStart: () => set({ taskTimeStart: Date.now() }),
   setTaskTimeEnd: () => set({ taskTimeEnd: Date.now() }),
+  sessionUid: undefined,
+  setSessionUid: (uid) => set({ sessionUid: uid }),
+  removeSessionUid: () => set({ sessionUid: undefined }),
 }));

@@ -1,11 +1,11 @@
 import { Button } from "@/components/button";
 import { Input } from "@/components/input";
 import { useStore } from "@/hooks/use-store";
-// import { supabase } from "@/services/services";
+import { supabase } from "@/services/services";
 import { useForm, Controller } from "react-hook-form";
 
 export const View1 = () => {
-  const { nextView, setFullName } = useStore();
+  const { nextView, setFullName, setSessionUid } = useStore();
 
   const form = useForm({
     defaultValues: {
@@ -17,8 +17,11 @@ export const View1 = () => {
     <form
       className="p-4 flex flex-col gap-4"
       onSubmit={form.handleSubmit(async ({ fullName }) => {
-        // await supabase.auth.signInAnonymously();
+        const { data } = await supabase.auth.signInAnonymously();
 
+        if (!data.user) return;
+
+        setSessionUid(data.user.id);
         setFullName(fullName);
         nextView();
       })}
@@ -50,7 +53,7 @@ export const View1 = () => {
       <Button
         variant="solid"
         color="blue"
-        disabled={!form.formState.isValid}
+        disabled={!form.formState.isValid || form.formState.isSubmitting}
         type="submit"
       >
         Continuar

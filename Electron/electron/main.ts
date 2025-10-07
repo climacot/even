@@ -97,7 +97,7 @@ function createWindow() {
     },
   });
 
-  // html.webContents.openDevTools({ mode: "undocked" });
+  html.webContents.openDevTools({ mode: "undocked" });
 
   if (VITE_DEV_SERVER_URL) {
     html.webContents.loadURL(VITE_DEV_SERVER_URL);
