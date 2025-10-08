@@ -1,0 +1,21 @@
+version: "3.9"
+name: sfe3000
+services:
+  python:
+    build: ./Python
+    container_name: python_service
+    ports:
+      - "8000:8000"
+    depends_on:
+      - node
+      - fuji
+  node:
+    build: ./Node
+    container_name: node_service
+    ports:
+      - "4000:4000"
+  fuji:
+    container_name: fuji_service
+    image: ghcr.io/pangaea-data-publisher/fuji
+    ports:
+      - "1071:1071"
