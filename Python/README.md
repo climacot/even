@@ -1,0 +1,7 @@
+1. python -m venv .venv
+2. .venv\Scripts\Activate.ps1
+3. Get-Command python
+4. python -m pip install --upgrade pip
+5. pip install -r requirements.txt
+6. python main.py
+7. deactivate
