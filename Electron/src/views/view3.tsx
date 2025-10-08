@@ -148,8 +148,6 @@ export const View3 = () => {
 
   useEffect(() => {
     window.ipcRenderer.on("url:change", async (_, prevUrl: string, url: string) => {
-      console.log({ prevUrl, url });
-
       setCurrentUrl(url);
       setPrevUrl(prevUrl);
 
@@ -239,15 +237,11 @@ export const View3 = () => {
           variant="solid"
           color="blue"
           onClick={async () => {
-            // const currentNav = navigation.find((n) => n.url === currentUrl);
+            const currentNav = navigation.find((n) => n.url === currentUrl);
 
             await window.ipcRenderer.invoke("modal", true);
 
-            // if (!currentNav!.rated) {
-            //   openModalNavgationEnd();
-            // } else {
-
-            // }
+            if (currentNav?.isRated === false) return openModalNavgationEnd();
 
             setTaskTimeEnd();
             openModalComplex();
@@ -262,8 +256,8 @@ export const View3 = () => {
             onSubmit={async ({ rated }) => {
               ratedNavigation(currentUrl!, rated);
               closeModalNavigationEnd();
-
-              await window.ipcRenderer.invoke("modal", false);
+              setTaskTimeEnd();
+              openModalComplex();
             }}
           />
         </Modal>
