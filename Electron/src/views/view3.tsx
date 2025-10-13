@@ -6,15 +6,16 @@ import { useEffect } from "react";
 import { useModal } from "@/hooks/use-modal";
 import { useStore } from "@/hooks/use-store";
 import WebIcon from "@/components/icons/web";
+import toast from "react-hot-toast";
 
 const NavigationForm = ({
   onSubmit,
 }: {
   onSubmit: ({ rated }: { rated: string }) => void;
 }) => {
-  const form = useForm<{ rated?: string }>({
+  const form = useForm({
     defaultValues: {
-      rated: undefined,
+      rated: "",
     },
   });
 
@@ -69,9 +70,9 @@ const ComplexModal = ({
 }: {
   onSubmit: ({ rated }: { rated: string }) => void;
 }) => {
-  const form = useForm<{ rated?: string }>({
+  const form = useForm({
     defaultValues: {
-      rated: undefined,
+      rated: "",
     },
   });
 
@@ -117,9 +118,8 @@ const ComplexModal = ({
 export const View3 = () => {
   const {
     prevUrl,
-    navigation,
     currentUrl,
-    addResource,
+    navigations,
     ratedNavigation,
     setTaskTimeEnd,
     setCurrentUrl,
@@ -153,9 +153,9 @@ export const View3 = () => {
 
       if (url.startsWith("https://www.google.com")) return;
 
-      const { navigation, addNavigation } = useStore.getState();
+      const { navigations, addNavigation } = useStore.getState();
 
-      if (navigation.find((n) => n.url === url)) return;
+      if (navigations.find((n) => n.url === url)) return;
 
       addNavigation(url);
 
@@ -171,12 +171,13 @@ export const View3 = () => {
     };
   }, []);
 
-  const alreadyNavigation = navigation.find((n) => {
-    return n.url === currentUrl && n.isRated === true;
+  const navigated = navigations.find((n) => {
+    return n.url === currentUrl && Boolean(n.rated) === true;
   });
 
-  const resources = navigation.filter((r) => r.isSelected === true);
-  const isDisabled = Boolean(resources.find((r) => r.url === currentUrl)) || !currentUrl;
+  const resources = navigations.filter((n) => {
+    return n.rated === 5;
+  });
 
   return (
     <>
@@ -196,26 +197,16 @@ export const View3 = () => {
             {currentUrl ?? "Se autocompletará cuando navegues por la web"}
           </div>
         </div>
-        {alreadyNavigation && (
+        {navigated && (
           <Likert
             variant={"horizontal"}
             values={["1", "2", "3", "4", "5"]}
             labels={["no lo es", "neutral", "es exactamente"]}
             label={"¿Es lo que buscaba?"}
-            value={alreadyNavigation.rated}
-            onChange={(rated) => {
-              ratedNavigation(alreadyNavigation.url, rated);
-            }}
+            value={navigated.rated?.toString()}
+            onChange={(rated) => ratedNavigation(navigated.url, Number(rated))}
           />
         )}
-        <Button
-          variant="soft"
-          color="yellow"
-          disabled={isDisabled}
-          onClick={() => addResource(currentUrl!)}
-        >
-          Seleccionar recurso
-        </Button>
         <div>
           <label className="block text-sm font-medium mb-2 dark:text-white">
             Recursos seleccionados
@@ -237,24 +228,26 @@ export const View3 = () => {
           variant="solid"
           color="blue"
           onClick={async () => {
-            const currentNav = navigation.find((n) => n.url === currentUrl);
+            const currentNavigation = navigations.find((n) => n.url === currentUrl);
 
             await window.ipcRenderer.invoke("modal", true);
 
-            if (currentNav?.isRated === false) return openModalNavgationEnd();
+            if (Boolean(currentNavigation?.rated) === false) {
+              return openModalNavgationEnd();
+            }
 
             setTaskTimeEnd();
             openModalComplex();
           }}
         >
-          Finalizar tarea 1
+          Finalizar tarea
         </Button>
       </div>
       {isModalNavigationOpenEnd && (
         <Modal>
           <NavigationForm
             onSubmit={async ({ rated }) => {
-              ratedNavigation(currentUrl!, rated);
+              ratedNavigation(currentUrl!, Number(rated));
               closeModalNavigationEnd();
               setTaskTimeEnd();
               openModalComplex();
@@ -266,7 +259,7 @@ export const View3 = () => {
         <Modal>
           <NavigationForm
             onSubmit={async ({ rated }) => {
-              ratedNavigation(prevUrl!, rated);
+              ratedNavigation(prevUrl!, Number(rated));
               closeModalNavigation();
 
               await window.ipcRenderer.invoke("modal", false);
@@ -278,8 +271,11 @@ export const View3 = () => {
         <Modal>
           <ComplexModal
             onSubmit={async ({ rated }) => {
-              setComplex(rated);
+              setComplex(Number(rated));
               closeModalComplex();
+
+              toast.success("Tarea finalizada.");
+
               nextView();
 
               await window.ipcRenderer.invoke("modal", false);

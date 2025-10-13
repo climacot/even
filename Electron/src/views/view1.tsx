@@ -3,9 +3,10 @@ import { Input } from "@/components/input";
 import { useStore } from "@/hooks/use-store";
 import { supabase } from "@/services/services";
 import { useForm, Controller } from "react-hook-form";
+import toast from "react-hot-toast";
 
 export const View1 = () => {
-  const { nextView, setFullName, setSessionUid } = useStore();
+  const { nextView, setFullName, setSessionId } = useStore();
 
   const form = useForm({
     defaultValues: {
@@ -17,13 +18,22 @@ export const View1 = () => {
     <form
       className="p-4 flex flex-col gap-4"
       onSubmit={form.handleSubmit(async ({ fullName }) => {
-        const { data } = await supabase.auth.signInAnonymously();
+        try {
+          const {
+            data: { user },
+          } = await supabase.auth.signInAnonymously();
 
-        if (!data.user) return;
+          if (!user) return;
 
-        setSessionUid(data.user.id);
-        setFullName(fullName);
-        nextView();
+          setSessionId(user.id);
+          setFullName(fullName);
+
+          toast.success("Sesión iniciada.");
+
+          nextView();
+        } catch (error) {
+          error instanceof Error && toast.error(error.message);
+        }
       })}
     >
       <div className="font-bold text-2xl">SFE3000</div>

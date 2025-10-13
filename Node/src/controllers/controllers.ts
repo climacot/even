@@ -48,10 +48,41 @@ export const getSemanticTecnologies = async (url: string) => {
   const jsonLd = $(jsonLDTag).toArray();
   const rdfa = $(rdfaItems).toArray();
 
+  // --- Palabras clave ---
+  const vocabKeywords = ["schema.org", "w3.org/ns", "vocab", "foaf", "dublincore", "goodrelations", "hydra", "skos"];
+  const ontologyKeywords = ["ontology", "rdf", "rdfs", "owl", "sparql", "turtle", "rdf+xml"];
+  const datasetKeywords = ["dataset", "data catalog", "datacatalog", "distribution", "data.gov", "linked data"];
+
+  // --- Función para contar ocurrencias ---
+  const countOccurrences = (text: string, keyword: string): number => {
+    const regex = new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi");
+    return (text.match(regex) || []).length;
+  };
+
+  // --- Unir todo el contenido de etiquetas detectadas ---
+  const combinedText = [...microformats, ...microdata, ...rdfa, ...jsonLd]
+    .map((node) => $(node).html() || "")
+    .join(" ")
+    .toLowerCase();
+
+  // --- Conteo global ---
+  const countCategory = (keywords: string[]) => {
+    return keywords.reduce((sum, kw) => {
+      return sum + countOccurrences(combinedText, kw);
+    }, 0);
+  };
+
+  const vocabCount = countCategory(vocabKeywords);
+  const ontologyCount = countCategory(ontologyKeywords);
+  const datasetCount = countCategory(datasetKeywords);
+
   return {
     microformats: microformats.length,
     microdata: microdata.length,
     jsonLd: jsonLd.length,
     rdfa: rdfa.length,
+    vocabularies: vocabCount,
+    ontologies: ontologyCount,
+    datasets: datasetCount,
   };
 };

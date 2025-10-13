@@ -2,29 +2,27 @@ import { Button } from "@/components/button";
 import { Likert } from "@/components/likert";
 import { useStore } from "@/hooks/use-store";
 import { Controller, useForm } from "react-hook-form";
-
-type State = {
-  experience?: string;
-  feeling?: string;
-};
+import toast from "react-hot-toast";
 
 export const View2 = () => {
-  const { nextView, setExperience, setFeeling, setTaskTimeStart } = useStore();
+  const { nextView, setFeeling, setTaskTimeStart } = useStore();
 
-  const form = useForm<State>({
+  const form = useForm({
     defaultValues: {
-      experience: undefined,
-      feeling: undefined,
+      experience: "",
+      feeling: "",
     },
   });
 
   return (
     <form
       className="p-4 flex flex-col gap-4"
-      onSubmit={form.handleSubmit(({ experience, feeling }) => {
+      onSubmit={form.handleSubmit(({ feeling }) => {
         setTaskTimeStart();
-        setExperience(experience!);
-        setFeeling(feeling!);
+        setFeeling(Number(feeling));
+
+        toast.success("Tarea iniciada.");
+
         nextView();
       })}
     >
@@ -35,20 +33,6 @@ export const View2 = () => {
         a la salud. Su tarea es encontrar un dataset confiable que contenga información
         sobre enfermedades o condiciones de salud.
       </p>
-      <Controller
-        name="experience"
-        control={form.control}
-        rules={{ required: true }}
-        render={({ field: { onChange } }) => (
-          <Likert
-            label="¿Qué tanta experiencia tiene buscando datasets?"
-            values={["1", "2", "3", "4", "5"]}
-            labels={["poca", "neutral", "mucha"]}
-            onChange={(value) => onChange(value)}
-            variant="horizontal"
-          />
-        )}
-      />
       <Controller
         name="feeling"
         control={form.control}

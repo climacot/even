@@ -1,38 +1,17 @@
 import { Button } from "@/components/button";
 import { useStore } from "@/hooks/use-store";
-import { supabase } from "@/services/services";
+import { createSession } from "@/services/database";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 export const View4 = () => {
   const [isLoading, setIsLoading] = useState(false);
-
-  const {
-    fullName,
-    experience,
-    feeling,
-    navigation,
-    taskTimeStart,
-    taskTimeEnd,
-    sessionUid,
-    complex,
-    reset,
-  } = useStore();
+  const store = useStore();
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center p-4">
       <div className="text-lg font-semibold">¡Tareas finalizadas!</div>
-      <div>Gracias por participar en esta prueba, picos 😘</div>
-      <div className="my-4 text-center break-all">
-        {JSON.stringify({
-          fullName,
-          experience,
-          feeling,
-          navigation,
-          complex,
-          taskTimeStart,
-          taskTimeEnd,
-        })}
-      </div>
+      <div>Gracias por participar en esta prueba</div>
       <Button
         color="blue"
         variant="solid"
@@ -41,29 +20,24 @@ export const View4 = () => {
           try {
             setIsLoading(true);
 
-            const { error } = await supabase.rpc("save_data", {
-              p_full_name: fullName,
-              p_experience: Number(experience),
-              p_feeling: Number(feeling),
-              p_navigation: navigation.map((n) => ({
-                ...n,
-                time: new Date(n.time),
-                selectTime: new Date(n.selectTime!),
-                rated: isNaN(Number(n.rated)) ? 0 : Number(n.rated),
-              })),
-              p_complex: Number(complex),
-              p_task_time_start: new Date(taskTimeStart!),
-              p_task_time_end: new Date(taskTimeEnd!),
-              p_session_uid: sessionUid,
+            await createSession({
+              complex: 0,
+              experience: 0,
+              feeling: 0,
+              fullName: "",
+              navigations: [],
+              sessionId: "",
+              taskTimeEnd: new Date(),
+              taskTimeStart: new Date(),
             });
 
-            if (error) throw new Error(error.message);
+            store.reset();
 
-            reset();
+            toast.success("Sesión finalizada.");
 
             window.ipcRenderer.send("go-home");
           } catch (error) {
-            console.error(error);
+            error instanceof Error && toast.error(error.message);
           } finally {
             setIsLoading(false);
           }

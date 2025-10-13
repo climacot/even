@@ -1,3 +1,4 @@
+import { Toaster } from "react-hot-toast";
 import { useStore } from "@/hooks/use-store";
 import { View1 } from "@/views/view1";
 import { View2 } from "@/views/view2";
@@ -18,6 +19,7 @@ export const App = () => {
       ) : currentView === 4 ? (
         <View4 />
       ) : null}
+      <Toaster toastOptions={{ position: "bottom-center" }} />
     </div>
   );
 };

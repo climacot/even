@@ -1,120 +1,75 @@
 import { create } from "zustand";
 
-type Navigation = {
-  url: string;
-  time: number;
-  isRated: boolean;
-  isSelected: boolean;
-  rated?: string;
-  selectTime?: number;
-};
-
 type State = {
+  complex?: number;
+  currentUrl?: string;
   currentView: number;
+  feeling?: number;
+  fullName?: string;
+  prevUrl?: string;
+  sessionId?: string;
+  taskTimeEnd?: Date;
+  taskTimeStart?: Date;
+  navigations: {
+    url: string;
+    rated?: number;
+    ratedAt?: Date;
+    navigatedAt: Date;
+  }[];
+  addNavigation: (url: string) => void;
   nextView: () => void;
   prevView: () => void;
-  resetView: () => void;
-  fullName?: string;
-  setFullName: (value: string) => void;
-  experience?: string;
-  setExperience: (value: string) => void;
-  feeling?: string;
-  setFeeling: (value: string) => void;
-  addResource: (url: string) => void;
-  navigation: Navigation[];
-  addNavigation: (url: string) => void;
-  ratedNavigation: (url: string, rated: string) => void;
-  complex?: string;
-  setComplex: (rated: string) => void;
+  ratedNavigation: (url: string, rated: number) => void;
   reset: () => void;
-  currentUrl?: string;
+  resetView: () => void;
+  setComplex: (rated: number) => void;
   setCurrentUrl: (url?: string) => void;
-  prevUrl?: string;
+  setFeeling: (rated: number) => void;
+  setFullName: (fullName: string) => void;
   setPrevUrl: (url?: string) => void;
-  taskTimeStart?: number;
-  taskTimeEnd?: number;
-  setTaskTimeStart: () => void;
+  setSessionId: (sessionId: string) => void;
   setTaskTimeEnd: () => void;
-  sessionUid?: string;
-  setSessionUid: (sessionUid: string) => void;
-  removeSessionUid: () => void;
+  setTaskTimeStart: () => void;
+};
+
+const initialState = {
+  complex: undefined,
+  currentUrl: undefined,
+  currentView: 1,
+  feeling: undefined,
+  fullName: undefined,
+  navigations: [],
+  prevUrl: undefined,
+  sessionUid: undefined,
+  taskTimeEnd: undefined,
+  taskTimeStart: undefined,
 };
 
 export const useStore = create<State>((set) => ({
-  currentView: 1,
+  ...initialState,
+  addNavigation: (url) => {
+    set((state) => ({
+      navigations: [...state.navigations, { url, navigatedAt: new Date() }],
+    }));
+  },
+  ratedNavigation: (url, rated) => {
+    set((state) => ({
+      navigations: state.navigations.map((n) => {
+        if (n.url === url) return { ...n, rated, ratedAt: new Date() };
+        return n;
+      }),
+    }));
+  },
   nextView: () => set((state) => ({ currentView: state.currentView + 1 })),
   prevView: () => set((state) => ({ currentView: state.currentView - 1 })),
+  reset: () => set({ ...initialState }),
   resetView: () => set({ currentView: 1 }),
-  fullName: undefined,
-  setFullName: (value) => set({ fullName: value }),
-  experience: undefined,
-  setExperience: (value) => set({ experience: value }),
-  feeling: undefined,
-  setFeeling: (value) => set({ feeling: value }),
-  resources: [],
-  addResource: (value) => {
-    set((state) => ({
-      navigation: state.navigation.map((nav) => {
-        if (nav.url === value) {
-          return {
-            ...nav,
-            isSelected: true,
-            selectTime: Date.now(),
-          };
-        }
-
-        return nav;
-      }),
-    }));
-  },
-  navigation: [],
-  addNavigation: (value) => {
-    set((state) => ({
-      navigation: [
-        ...state.navigation,
-        {
-          url: value,
-          isRated: false,
-          isSelected: false,
-          time: Date.now(),
-        },
-      ],
-    }));
-  },
-  ratedNavigation: (value, rated) => {
-    set((state) => ({
-      navigation: state.navigation.map((nav) => {
-        if (nav.url === value) return { ...nav, isRated: true, rated };
-        return nav;
-      }),
-    }));
-  },
-  complex: undefined,
   setComplex: (rated) => set({ complex: rated }),
-  reset: () => {
-    set({
-      currentView: 1,
-      fullName: undefined,
-      experience: undefined,
-      feeling: undefined,
-      navigation: [],
-      complex: undefined,
-      currentUrl: undefined,
-      taskTimeEnd: undefined,
-      taskTimeStart: undefined,
-      prevUrl: undefined,
-      sessionUid: undefined,
-    });
-  },
-  currentUrl: undefined,
   setCurrentUrl: (url) => set({ currentUrl: url }),
-  prevUrl: undefined,
+  setFeeling: (rated) => set({ feeling: rated }),
+  setFullName: (rated) => set({ fullName: rated }),
   setPrevUrl: (url) => set({ prevUrl: url }),
-  taskTimeStart: undefined,
-  taskTimeEnd: undefined,
-  setTaskTimeStart: () => set({ taskTimeStart: Date.now() }),
-  setTaskTimeEnd: () => set({ taskTimeEnd: Date.now() }),
-  sessionUid: undefined,
-  setSessionUid: (uid) => set({ sessionUid: uid }),
-  removeSessionUid: () => set({ sessionUid: undefined }),
+  setSessionId: (sessionId) => set({ sessionId }),
+  setTaskTimeEnd: () => set({ taskTimeEnd: new Date() }),
+  setTaskTimeStart: () => set({ taskTimeStart: new Date() }),
 }));
