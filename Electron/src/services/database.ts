@@ -2,7 +2,6 @@ import { supabase } from "@/services/services";
 
 export const createSession = async ({
   complex,
-  experience,
   feeling,
   fullName,
   navigations,
@@ -11,7 +10,6 @@ export const createSession = async ({
   taskTimeStart,
 }: {
   complex: number;
-  experience: number;
   feeling: number;
   fullName: string;
   sessionId: string;
@@ -27,13 +25,13 @@ export const createSession = async ({
   await supabase
     .rpc("create_session", {
       p_complex: complex,
-      p_experience: experience,
       p_feeling: feeling,
       p_full_name: fullName,
-      p_session_uid: sessionId,
+      p_session_id: sessionId,
       p_task_time_end: taskTimeEnd,
       p_task_time_start: taskTimeStart,
       p_navigations: navigations,
+      p_cat_task_id: "e8c2a5fb-3b18-4d5b-ac24-a4ccaadc4f7b",
     })
     .throwOnError();
 };

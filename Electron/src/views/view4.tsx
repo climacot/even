@@ -21,14 +21,17 @@ export const View4 = () => {
             setIsLoading(true);
 
             await createSession({
-              complex: 0,
-              experience: 0,
-              feeling: 0,
-              fullName: "",
-              navigations: [],
-              sessionId: "",
-              taskTimeEnd: new Date(),
-              taskTimeStart: new Date(),
+              complex: store.complex!,
+              feeling: store.feeling!,
+              fullName: store.fullName!,
+              sessionId: store.sessionId!,
+              taskTimeEnd: store.taskTimeEnd!,
+              taskTimeStart: store.taskTimeStart!,
+              navigations: store.navigations!.map((n) => ({
+                ...n,
+                rated: n.rated!,
+                ratedAt: n.ratedAt!,
+              })),
             });
 
             store.reset();
