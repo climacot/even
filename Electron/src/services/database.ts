@@ -8,6 +8,7 @@ export const createSession = async ({
   sessionId,
   taskTimeEnd,
   taskTimeStart,
+  taskId,
 }: {
   complex: number;
   feeling: number;
@@ -15,6 +16,7 @@ export const createSession = async ({
   sessionId: string;
   taskTimeEnd: Date;
   taskTimeStart: Date;
+  taskId: string;
   navigations: {
     url: string;
     rated: number;
@@ -31,7 +33,19 @@ export const createSession = async ({
       p_task_time_end: taskTimeEnd,
       p_task_time_start: taskTimeStart,
       p_navigations: navigations,
-      p_cat_task_id: "e8c2a5fb-3b18-4d5b-ac24-a4ccaadc4f7b",
+      p_cat_task_id: taskId,
     })
     .throwOnError();
+};
+
+export const getTask = async () => {
+  const { data } = await supabase.rpc("get_task").throwOnError();
+
+  if (!data) throw new Error("Task not found.");
+
+  return {
+    id: data.id,
+    description: data.description,
+    createdAt: data.created_at,
+  };
 };

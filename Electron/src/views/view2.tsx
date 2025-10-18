@@ -1,11 +1,21 @@
 import { Button } from "@/components/button";
+import { Error } from "@/components/error";
 import { Likert } from "@/components/likert";
 import { useStore } from "@/hooks/use-store";
+import { getTask } from "@/services/database";
+import { useQuery } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 export const View2 = () => {
-  const { nextView, setFeeling, setTaskTimeStart } = useStore();
+  const query = useQuery({
+    queryKey: ["task"],
+    refetchOnWindowFocus: false,
+    retry: false,
+    queryFn: getTask,
+  });
+
+  const { nextView, prevView, setFeeling, setTaskTimeStart, setTaskId } = useStore();
 
   const form = useForm({
     defaultValues: {
@@ -18,21 +28,26 @@ export const View2 = () => {
     <form
       className="p-4 flex flex-col gap-4"
       onSubmit={form.handleSubmit(({ feeling }) => {
-        setTaskTimeStart();
         setFeeling(Number(feeling));
+        setTaskId(query.data!.id);
+        setTaskTimeStart();
 
         toast.success("Tarea iniciada.");
 
         nextView();
       })}
     >
-      <div className="font-bold text-2xl">SFE3000</div>
-      <div>Tarea 1/1</div>
-      <p>
-        Imagine que trabaja en un proyecto de clase sobre inteligencia artificial aplicado
-        a la salud. Su tarea es encontrar un dataset confiable que contenga información
-        sobre enfermedades o condiciones de salud.
-      </p>
+      <div className="flex gap-2 items-center">
+        <button
+          className="bg-gray-100 rounded-full p-2 w-8 h-8 flex justify-center items-center cursor-pointer"
+          onClick={() => prevView()}
+        >
+          ←
+        </button>
+        <div className="font-bold text-2xl">SFE3000</div>
+      </div>
+      <div>Tarea</div>
+      <p>{query.data?.description ?? "..."}</p>
       <Controller
         name="feeling"
         control={form.control}
@@ -47,10 +62,11 @@ export const View2 = () => {
           />
         )}
       />
+      {query.error && <Error message={query.error.message} />}
       <Button
         variant="solid"
         color="blue"
-        disabled={!form.formState.isValid}
+        disabled={!form.formState.isValid || !query.data}
         type="submit"
       >
         Iniciar tarea 1

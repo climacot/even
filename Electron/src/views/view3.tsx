@@ -183,7 +183,7 @@ export const View3 = () => {
     <>
       <div className="p-4 flex flex-col gap-4">
         <div className="font-bold text-2xl">SFE3000</div>
-        <div>Tarea 1/1</div>
+        <div>Tarea</div>
         <p>
           Imagina que trabajas en un proyecto de clase sobre inteligencia artificial
           aplicado a la salud. Tu tarea es encontrar un dataset confiable que contenga
@@ -194,7 +194,7 @@ export const View3 = () => {
             Recurso actual
           </label>
           <div className="break-all text-sm py-2.5 px-4 border border-gray-200 rounded-lg dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600">
-            {currentUrl ?? "Se autocompletará cuando navegues por la web"}
+            {currentUrl ?? "Se autocompletará cuando navegues por la web."}
           </div>
         </div>
         {navigated && (
@@ -232,7 +232,7 @@ export const View3 = () => {
 
             await window.ipcRenderer.invoke("modal", true);
 
-            if (Boolean(currentNavigation?.rated) === false) {
+            if (currentNavigation && Boolean(currentNavigation?.rated) === false) {
               return openModalNavgationEnd();
             }
 

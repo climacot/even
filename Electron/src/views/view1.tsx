@@ -25,6 +25,8 @@ export const View1 = () => {
 
           if (!user) return;
 
+          await supabase.auth.updateUser({ data: { full_name: fullName } });
+
           setSessionId(user.id);
           setFullName(fullName);
 

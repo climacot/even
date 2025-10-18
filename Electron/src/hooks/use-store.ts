@@ -10,6 +10,7 @@ type State = {
   sessionId?: string;
   taskTimeEnd?: Date;
   taskTimeStart?: Date;
+  taskId?: string;
   navigations: {
     url: string;
     rated?: number;
@@ -30,6 +31,7 @@ type State = {
   setSessionId: (sessionId: string) => void;
   setTaskTimeEnd: () => void;
   setTaskTimeStart: () => void;
+  setTaskId: (taskId: string) => void;
 };
 
 const initialState = {
@@ -43,6 +45,7 @@ const initialState = {
   sessionUid: undefined,
   taskTimeEnd: undefined,
   taskTimeStart: undefined,
+  taskId: undefined,
 };
 
 export const useStore = create<State>((set) => ({
@@ -72,4 +75,5 @@ export const useStore = create<State>((set) => ({
   setSessionId: (sessionId) => set({ sessionId }),
   setTaskTimeEnd: () => set({ taskTimeEnd: new Date() }),
   setTaskTimeStart: () => set({ taskTimeStart: new Date() }),
+  setTaskId: (taskId) => set({ taskId }),
 }));

@@ -21,6 +21,7 @@ export const View4 = () => {
             setIsLoading(true);
 
             await createSession({
+              taskId: store.taskId!,
               complex: store.complex!,
               feeling: store.feeling!,
               fullName: store.fullName!,
