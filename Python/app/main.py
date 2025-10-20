@@ -1,13 +1,129 @@
-from typing import Union
+from fastapi import FastAPI, Request
+from supabase import create_client, Client
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+import requests
 
-from fastapi import FastAPI
+google_url = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed"
+google_api_key = "AIzaSyA78-0H2rB2aQjDNY1Zk-b13HpqPs8ABI4"
+fuji_url = "http://localhost:1071/fuji/api/v1/evaluate"
+technologies_url = "http://localhost:4000"
+
+url: str = "https://hgsxnscedselcjiucliu.supabase.co"
+key: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnc3huc2NlZHNlbGNqaXVjbGl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2MDUwMTMsImV4cCI6MjA3NTE4MTAxM30.Bz8FvRMIoBEeLLfwiZYV__29a9DTcn9uSxXgbBBHOuc"
+
+supabase: Client = create_client(url, key)
 
 app = FastAPI()
 
-@app.get("/")
-def read_root(search_session_id: str):
-    return {"Hello": "World"}
+origins = [
+    "http://localhost:5173"
+]
 
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.post("/")
+async def read_root(request: Request):
+    auth_header = request.headers.get("Authorization")
+    access_token = auth_header.split(" ")[1]
+    
+    scoped_supabase_client = supabase.postgrest.auth(access_token)    
+    response = scoped_supabase_client.rpc("get_unevaluated_resources", params={}).execute()
+    
+    for resource in response.data:
+        resource_id = resource["id"]
+        web_url = resource["url"]        
+        
+        response = requests.post(
+            url= fuji_url, 
+            json= {
+                "object_identifier": web_url,
+                "metadata_service_type": "oai_pmh",
+                "metric_version": "metrics_v0.8",
+                "use_datacite": True,
+                "use_github": False, 
+                "test_debug": True,                                                       
+            },
+            headers={
+                "Authorization": "Basic bWFydmVsOndvbmRlcndvbWFu",
+                "Content-Type": "application/json",
+                "accept": "application/json",                
+            }
+        )                
+        
+        data = response.json()
+
+        f1 = data["summary"]["score_percent"]["F1"]
+        f2 = data["summary"]["score_percent"]["F2"]
+        f3 = data["summary"]["score_percent"]["F3"]
+        f4 = data["summary"]["score_percent"]["F4"]
+        i1 = data["summary"]["score_percent"]["I1"]
+        i2 = data["summary"]["score_percent"]["I2"]
+        i3 = data["summary"]["score_percent"]["I3"]
+        fair_total = data["summary"]["score_percent"]["FAIR"]
+
+        response = requests.post(
+            url=technologies_url,
+            json={
+                "url": web_url
+            }
+        )
+        
+        tecnologies = response.json()
+        
+        microformats = tecnologies["microformats"]
+        microdata = tecnologies["microdata"]
+        jsonLd = tecnologies["jsonLd"]
+        rdfa = tecnologies["rdfa"]
+        vocabularies = tecnologies["vocabularies"]
+        ontologies = tecnologies["ontologies"]
+        datasets = tecnologies["datasets"]
+    
+        response = requests.get(
+            url=google_url,
+            params={                
+                "url": web_url,
+                "key": google_api_key,
+                "category": ["accessibility", "performance", "seo"]
+            }
+        )
+        
+        if response.ok == False:
+            raise Exception(response.reason)
+        
+        google = response.json()
+        
+        seo = google["lighthouseResult"]["categories"]["seo"]["score"]
+        accessibility = google["lighthouseResult"]["categories"]["accessibility"]["score"]
+        performance = google["lighthouseResult"]["categories"]["performance"]["score"]
+        
+        scoped_supabase_client.rpc("add_automatic_evaluation", params={
+            "p_resource_id": resource_id,
+            "p_num_microdata": microdata,
+            "p_num_microformats": microformats,
+            "p_num_rdfa": rdfa,
+            "p_num_jsonld": jsonLd,
+            "p_num_vocabularies": vocabularies,
+            "p_num_ontologies": ontologies,
+            "p_num_datasets": datasets,
+            "p_fair_score": fair_total,
+            "p_f1_score": f1,
+            "p_f2_score": f2,
+            "p_f3_score": f3,
+            "p_f4_score": f4,
+            "p_i1_score": i1,
+            "p_i2_score": i2,
+            "p_i3_score": i3,
+            "p_seo_score": seo,
+            "p_accesibility_score": accessibility,
+            "p_performance_score": performance
+        }).execute()
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)

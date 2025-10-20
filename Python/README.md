@@ -5,7 +5,7 @@
 3. Get-Command python
 4. python -m pip install --upgrade pip
 5. pip install -r requirements.txt
-6. python main.py
+6. fastapi dev app/main.py
 7. deactivate
 
 # docker
