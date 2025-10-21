@@ -28,17 +28,18 @@ export const View4 = () => {
               sessionId: store.sessionId!,
               taskTimeEnd: store.taskTimeEnd!,
               taskTimeStart: store.taskTimeStart!,
-              navigations: store.navigations!.map((n) => ({
-                ...n,
-                rated: n.rated!,
-                ratedAt: n.ratedAt!,
-              })),
+              navigations: store.navigations
+                .filter((n) => n.rated)
+                .map((n) => ({
+                  ...n,
+                  rated: n.rated!,
+                  ratedAt: n.ratedAt!,
+                })),
             });
 
             store.reset();
-
             toast.success("Sesión finalizada.");
-
+            
             window.ipcRenderer.send("go-home");
           } catch (error) {
             error instanceof Error && toast.error(error.message);
