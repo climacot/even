@@ -33,11 +33,7 @@ const INITIAL_BROWSER_URL = common.initialWeb;
 
 let isModalOpen: boolean = false;
 let lastUrl: string | undefined;
-
-// ------------------------- DISABLE BOTS ----------------------
-
-app.commandLine.appendSwitch("disable-blink-features", "AutomationControlled");
-const USER_AGENT = common.userAgent;
+let currentUrl: string | undefined;
 
 function createWindow() {
   // ----------------------- MAIN VIEW --------------------------
@@ -51,10 +47,6 @@ function createWindow() {
     },
   });
 
-  win.setMenuBarVisibility(false);
-  win.maximize();
-  win.show();
-
   // ----------------------- BROWSER WEB ------------------------
 
   const web = new WebContentsView({
@@ -64,8 +56,7 @@ function createWindow() {
     },
   });
 
-  web.webContents.setUserAgent(USER_AGENT);
-  web.webContents.loadURL(INITIAL_BROWSER_URL, { userAgent: USER_AGENT });
+  web.webContents.loadURL(INITIAL_BROWSER_URL);
   win.contentView.addChildView(web, 0);
 
   // web.webContents.openDevTools({ mode: "undocked" });
@@ -97,7 +88,7 @@ function createWindow() {
     },
   });
 
-  html.webContents.openDevTools({ mode: "undocked" });
+  // html.webContents.openDevTools({ mode: "undocked" });
 
   if (VITE_DEV_SERVER_URL) {
     html.webContents.loadURL(VITE_DEV_SERVER_URL);
@@ -106,6 +97,14 @@ function createWindow() {
   }
 
   win.contentView.addChildView(html, 2);
+
+  // ---------------------- CARGA INITIAL ------------------------
+
+  web.setVisible(false);
+
+  win.setMenuBarVisibility(false);
+  win.maximize();
+  win.show();
 
   // ----------------------- FUNCTIONS ---------------------------
 
@@ -145,22 +144,30 @@ function createWindow() {
 
   win.on("resize", resizeViews);
 
+  // -------------------- WEB ------------------------------------
+
+  ipcMain.handle("web:visible", (_, isVisible) => {
+    web.setVisible(isVisible);
+  });
+
   // -------------------- MODAL ----------------------------------
 
+  const processUrlChange = () => {
+    if (lastUrl === currentUrl) return;
+
+    html.webContents.send("url:change", lastUrl, currentUrl);
+
+    lastUrl = currentUrl;
+  };
+
   web.webContents.on("did-navigate", (_, url) => {
-    if (lastUrl === url) return;
-
-    html.webContents.send("url:change", lastUrl, url);
-
-    lastUrl = url;
+    currentUrl = url;
+    processUrlChange();
   });
 
   web.webContents.on("did-navigate-in-page", (_, url) => {
-    if (lastUrl === url) return;
-
-    html.webContents.send("url:change", lastUrl, url);
-
-    lastUrl = url;
+    currentUrl = url;
+    processUrlChange();
   });
 
   ipcMain.handle("modal", (_, isOpen) => {

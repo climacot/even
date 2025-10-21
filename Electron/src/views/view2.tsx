@@ -10,8 +10,6 @@ import toast from "react-hot-toast";
 export const View2 = () => {
   const query = useQuery({
     queryKey: ["task"],
-    refetchOnWindowFocus: false,
-    retry: false,
     queryFn: getTask,
   });
 
@@ -27,10 +25,12 @@ export const View2 = () => {
   return (
     <form
       className="p-4 flex flex-col gap-4"
-      onSubmit={form.handleSubmit(({ feeling }) => {
+      onSubmit={form.handleSubmit(async ({ feeling }) => {
         setFeeling(Number(feeling));
         setTaskId(query.data!.id);
         setTaskTimeStart();
+
+        await window.ipcRenderer.invoke("web:visible", true);
 
         toast.success("Tarea iniciada.");
 

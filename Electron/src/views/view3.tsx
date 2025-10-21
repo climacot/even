@@ -278,6 +278,7 @@ export const View3 = () => {
 
               nextView();
 
+              await window.ipcRenderer.invoke("web:visible", false);
               await window.ipcRenderer.invoke("modal", false);
             }}
           />
