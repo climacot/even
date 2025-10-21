@@ -80,6 +80,7 @@ const getRdfa = (html: string) => {
   $tags.each((_, element) => {
     try {
       const $element = $(element);
+
       const data: {
         vocab?: string;
         type?: string;
