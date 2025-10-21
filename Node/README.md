@@ -1,3 +1,7 @@
+# comandos
+
+1. npm run dev
+
 # docker
 
 1. docker build -t myimage .
