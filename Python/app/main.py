@@ -33,29 +33,29 @@ async def read_root(request: Request):
     auth_header = request.headers.get("Authorization")
     access_token = auth_header.split(" ")[1]
     
-    scoped_supabase_client = supabase.postgrest.auth(access_token)    
+    scoped_supabase_client = supabase.postgrest.auth(access_token)
     response = scoped_supabase_client.rpc("get_unevaluated_resources", params={}).execute()
     
     for resource in response.data:
         resource_id = resource["id"]
-        web_url = resource["url"]        
+        web_url = resource["url"]
         
         response = requests.post(
-            url= fuji_url, 
+            url= fuji_url,
             json= {
                 "object_identifier": web_url,
                 "metadata_service_type": "oai_pmh",
                 "metric_version": "metrics_v0.8",
                 "use_datacite": True,
-                "use_github": False, 
-                "test_debug": True,                                                       
+                "use_github": False,
+                "test_debug": True,
             },
             headers={
                 "Authorization": "Basic bWFydmVsOndvbmRlcndvbWFu",
                 "Content-Type": "application/json",
-                "accept": "application/json",                
+                "accept": "application/json",
             }
-        )                
+        )
         
         data = response.json()
 
@@ -87,7 +87,7 @@ async def read_root(request: Request):
     
         response = requests.get(
             url=google_url,
-            params={                
+            params={
                 "url": web_url,
                 "key": google_api_key,
                 "category": ["accessibility", "performance", "seo"]
