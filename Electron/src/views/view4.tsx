@@ -10,8 +10,8 @@ export const View4 = () => {
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center p-4">
-      <div className="text-lg font-semibold">¡Tareas finalizadas!</div>
-      <div>Gracias por participar en esta prueba</div>
+      <div className="text-lg font-semibold">¡Tarea finalizada!</div>
+      <div className="mb-4">Gracias por participar en esta prueba</div>
       <Button
         color="blue"
         variant="solid"
