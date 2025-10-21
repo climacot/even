@@ -1,0 +1,17 @@
+{
+  "name": "microformat-node",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.mjs",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cheerio": "^1.1.2",
+    "jsonld-streaming-parser": "^5.0.0",
+    "microformat-node": "^2.0.4",
+    "rdfa-streaming-parser": "^3.0.2"
+  }
+}
