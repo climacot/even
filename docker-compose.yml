@@ -19,6 +19,9 @@ services:
   node:
     build: ./Node
     container_name: node_service
+    environment:
+      PORT: 4000
+      NODE_ENV: production
     ports:
       - "4000:4000"
   fuji:
