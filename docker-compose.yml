@@ -19,9 +19,9 @@ services:
   node:
     build: ./Node
     container_name: node_service
-    environment:
-      PORT: 4000
+    environment:      
       NODE_ENV: production
+      PORT: 4000
     ports:
       - "4000:4000"
   fuji:
@@ -32,5 +32,8 @@ services:
   dashboard:
     build: ./Vite
     container_name: vite_service
+    environment:
+      VITE_SUPABASE_URL: https://hgsxnscedselcjiucliu.supabase.co
+      VITE_SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnc3huc2NlZHNlbGNqaXVjbGl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2MDUwMTMsImV4cCI6MjA3NTE4MTAxM30.Bz8FvRMIoBEeLLfwiZYV__29a9DTcn9uSxXgbBBHOuc
     ports:
       - "3000:3000"
