@@ -10,6 +10,7 @@ export const DashboardPage = () => {
 
   const query = useQuery({
     queryKey: ["task"],
+    refetchInterval: 5000,
     queryFn: getUnevaluatedResources,
   });
 
