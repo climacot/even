@@ -32,14 +32,12 @@ export const SignInPage = () => {
         type="email"
         name="username"
         placeholder="username"
-        defaultValue="climacot@unicauca.edu.co"
         className="border p-2"
       />
       <input
         type="password"
         name="password"
         placeholder="password"
-        defaultValue="Computadorgamer1."
         className="border p-2"
       />
       <button
