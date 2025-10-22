@@ -1,16 +1,20 @@
 from fastapi import FastAPI, Request
 from supabase import create_client, Client
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
+from dotenv import load_dotenv
+import traceback
 import requests
+import uvicorn
+import os
 
-google_url = "https://www.googleapis.com/pagespeedonline/v5/runPagespeed"
-google_api_key = "AIzaSyA78-0H2rB2aQjDNY1Zk-b13HpqPs8ABI4"
-fuji_url = "http://localhost:1071/fuji/api/v1/evaluate"
-technologies_url = "http://localhost:4000"
+load_dotenv()
 
-url: str = "https://hgsxnscedselcjiucliu.supabase.co"
-key: str = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhnc3huc2NlZHNlbGNqaXVjbGl1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk2MDUwMTMsImV4cCI6MjA3NTE4MTAxM30.Bz8FvRMIoBEeLLfwiZYV__29a9DTcn9uSxXgbBBHOuc"
+google_url = os.getenv("GOOGLE_URL")
+google_api_key = os.getenv("GOOGLE_KEY")
+fuji_url = os.getenv("FUJI_URL")
+technologies_url = os.getenv("TECHNOLOGIES_URL")
+url = os.getenv("SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
 
 supabase: Client = create_client(url, key)
 
@@ -123,8 +127,8 @@ async def read_root(request: Request):
                 "p_accesibility_score": accessibility,
                 "p_performance_score": performance
             }).execute()
-    except:
-        print("An exception occurred")
+    except Exception:
+        traceback.print_exc()
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
