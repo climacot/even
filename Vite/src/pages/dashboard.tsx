@@ -44,7 +44,7 @@ export const DashboardPage = () => {
               data: { session },
             } = await supabase.auth.getSession();
 
-            await fetch("http://127.0.0.1:8000", {
+            await fetch("http://localhost:8200", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
