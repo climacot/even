@@ -34,15 +34,17 @@ export const View1 = () => {
 
           nextView();
         } catch (error) {
-          error instanceof Error && toast.error(error.message);
+          if (error instanceof Error) {
+            toast.error(error.message);
+          }
         }
       })}
     >
       <div className="font-bold text-2xl">SFE3000</div>
       <h1>Bienvenid@ a EVAEN</h1>
       <p>
-        Gracias por participar en esta prueba, antes de continuar por favor complete esta
-        información:
+        Gracias por participar en esta prueba, antes de continuar por favor
+        complete esta información:
       </p>
       <Controller
         name="fullName"

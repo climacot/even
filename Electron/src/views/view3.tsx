@@ -27,7 +27,9 @@ const NavigationForm = ({
       })}
     >
       <div>
-        <div className="text-lg font-bold">Clasificación del resultado anterior</div>
+        <div className="text-lg font-bold">
+          Clasificación del resultado anterior
+        </div>
         <div>Clasifique en base a la siguiente escala</div>
       </div>
       <Controller
@@ -84,7 +86,9 @@ const ComplexModal = ({
       })}
     >
       <div>
-        <div className="text-lg font-bold">Clasificación complejidad tarea 1</div>
+        <div className="text-lg font-bold">
+          Clasificación complejidad tarea 1
+        </div>
         <div>Clasifique en base a la siguiente escala</div>
       </div>
       <Controller
@@ -147,29 +151,32 @@ export const View3 = () => {
   } = useModal();
 
   useEffect(() => {
-    window.ipcRenderer.on("url:change", async (_, prevUrl: string, url: string) => {
-      setCurrentUrl(url);
-      setPrevUrl(prevUrl);
+    window.ipcRenderer.on(
+      "url:change",
+      async (_, prevUrl: string, url: string) => {
+        setCurrentUrl(url);
+        setPrevUrl(prevUrl);
 
-      if (url.startsWith("https://www.google.com")) return;
+        if (url.startsWith("https://www.google.com")) return;
 
-      const { navigations, addNavigation } = useStore.getState();
+        const { navigations, addNavigation } = useStore.getState();
 
-      if (navigations.find((n) => n.url === url)) return;
+        if (navigations.find((n) => n.url === url)) return;
 
-      addNavigation(url);
+        addNavigation(url);
 
-      if (prevUrl.startsWith("https://www.google.com")) return;
+        if (prevUrl.startsWith("https://www.google.com")) return;
 
-      await window.ipcRenderer.invoke("modal", true);
+        await window.ipcRenderer.invoke("modal", true);
 
-      openModalNavgation();
-    });
+        openModalNavgation();
+      }
+    );
 
     return () => {
       window.ipcRenderer.removeAllListeners("url:change");
     };
-  }, []);
+  }, [openModalNavgation, setCurrentUrl, setPrevUrl]);
 
   const navigated = navigations.find((n) => {
     return n.url === currentUrl && Boolean(n.rated) === true;
@@ -185,9 +192,10 @@ export const View3 = () => {
         <div className="font-bold text-2xl">SFE3000</div>
         <div>Tarea</div>
         <p>
-          Imagina que trabajas en un proyecto de clase sobre inteligencia artificial
-          aplicado a la salud. Tu tarea es encontrar un dataset confiable que contenga
-          información sobre enfermedades o condiciones de salud.
+          Imagina que trabajas en un proyecto de clase sobre inteligencia
+          artificial aplicado a la salud. Tu tarea es encontrar un dataset
+          confiable que contenga información sobre enfermedades o condiciones de
+          salud.
         </p>
         <div>
           <label className="block text-sm font-medium mb-2 dark:text-white">
@@ -228,11 +236,16 @@ export const View3 = () => {
           variant="solid"
           color="blue"
           onClick={async () => {
-            const currentNavigation = navigations.find((n) => n.url === currentUrl);
+            const currentNavigation = navigations.find(
+              (n) => n.url === currentUrl
+            );
 
             await window.ipcRenderer.invoke("modal", true);
 
-            if (currentNavigation && Boolean(currentNavigation?.rated) === false) {
+            if (
+              currentNavigation &&
+              Boolean(currentNavigation?.rated) === false
+            ) {
               return openModalNavgationEnd();
             }
 

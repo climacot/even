@@ -4,7 +4,7 @@ type Props = {
   children: ReactNode;
 };
 
-export const Modal = forwardRef<HTMLDivElement, Props>((props, _) => {
+export const Modal = forwardRef<HTMLDivElement, Props>((props) => {
   const { children } = props;
 
   return (

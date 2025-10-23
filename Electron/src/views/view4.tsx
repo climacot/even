@@ -39,10 +39,12 @@ export const View4 = () => {
 
             store.reset();
             toast.success("Sesión finalizada.");
-            
+
             window.ipcRenderer.send("go-home");
           } catch (error) {
-            error instanceof Error && toast.error(error.message);
+            if (error instanceof Error) {
+              toast.error(error.message);
+            }
           } finally {
             setIsLoading(false);
           }
