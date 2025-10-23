@@ -5,10 +5,10 @@
 3. Get-Command python
 4. python -m pip install --upgrade pip
 5. pip install -r requirements.txt
-6. fastapi dev app/main.py --port 6000
+6. fastapi dev app/main.py --port 8200
 7. deactivate
 
 # docker
 
 1. docker build -t myimage .
-2. docker run -d --name mycontainer -p 60:60 myimage
+2. docker run -d --name mycontainer -p 8200:8200 myimage
