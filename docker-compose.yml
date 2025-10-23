@@ -1,18 +1,21 @@
 version: "3.9"
 name: sfe3000
+include:
+  - path: ./Supabase/docker-compose.yml
 services:
   python:
     build: ./Python
     container_name: python_service
-    environment:
+    environment:      
       GOOGLE_URL: https://www.googleapis.com/pagespeedonline/v5/runPagespeed
       FUJI_URL: http://fuji:1071/fuji/api/v1/evaluate
-      TECHNOLOGIES_URL: http://node:4000
+      TECHNOLOGIES_URL: http://node:2000
       SUPABASE_URL: ${SUPABASE_URL}
       SUPABASE_KEY: ${SUPABASE_KEY}
       GOOGLE_KEY: ${GOOGLE_KEY}
+      PORT: 8200    
     ports:
-      - "8000:8000"
+      - "8200:8200"
     depends_on:
       - node
       - fuji
@@ -21,9 +24,9 @@ services:
     container_name: node_service
     environment:
       NODE_ENV: production
-      PORT: 4000
+      PORT: 2000
     ports:
-      - "4000:4000"
+      - "2000:2000"
   fuji:
     container_name: fuji_service
     image: ghcr.io/pangaea-data-publisher/fuji
