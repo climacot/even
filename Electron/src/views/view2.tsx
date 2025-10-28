@@ -43,9 +43,9 @@ export const View2 = () => {
             rules={{ required: true }}
             render={({ field: { onChange } }) => (
               <Likert
-                label="¿Qué tan seguro se encuentra en que encontrará almenos un resultado?"
+                label="¿Qué tan seguro está de que encontrará lo que busca?"
                 values={["1", "2", "3", "4", "5"]}
-                labels={["poca seguro", "neutral", "muy seguro"]}
+                labels={["poco seguro", "neutral", "muy seguro"]}
                 variant="horizontal"
                 onChange={onChange}
               />

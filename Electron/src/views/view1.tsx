@@ -44,8 +44,15 @@ export const View1 = () => {
       <Layout>
         <Layout.Header>
           <div className="text-neutral-950">
-            Gracias por participar en esta prueba, antes de continuar por favor
-            completa esta información
+            ¡Gracias por hacer parte en esta prueba! A continuación realizarás
+            una evaluación de la encontrabilidad de la información como parte de
+            un trabajo de grado del programa de Ingeniería de Sistemas.
+          </div>
+          <br />
+          <div>
+            El propósito de esta actividad es que navegues en internet buscando
+            recursos web y evaluandolos segun la tarea propuesta en el siguiente
+            paso.
           </div>
         </Layout.Header>
         <Layout.Body>

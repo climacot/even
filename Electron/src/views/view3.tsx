@@ -88,7 +88,7 @@ export const View3 = () => {
               <Input
                 disabled
                 label="Recurso actual"
-                placeholder="Se autocompletará cuando navegues por la web."
+                placeholder="Se autocompletará cuando navegues."
                 value={currentUrl}
                 onChange={() => {}}
               />
