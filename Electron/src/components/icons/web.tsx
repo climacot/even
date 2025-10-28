@@ -22,4 +22,5 @@ const WebIcon = (props: SVGProps<SVGSVGElement>) => (
     />
   </svg>
 );
+
 export default WebIcon;

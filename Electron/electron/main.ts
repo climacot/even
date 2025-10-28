@@ -33,7 +33,6 @@ const INITIAL_BROWSER_URL = common.initialWeb;
 
 let isModalOpen: boolean = false;
 let lastUrl: string | undefined;
-let currentUrl: string | undefined;
 
 function createWindow() {
   // ----------------------- MAIN VIEW --------------------------
@@ -43,7 +42,6 @@ function createWindow() {
     icon: path.join(process.env.VITE_PUBLIC, "electron-vite.svg"),
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs"),
-      sandbox: true,
     },
   });
 
@@ -52,7 +50,6 @@ function createWindow() {
   const web = new WebContentsView({
     webPreferences: {
       preload: path.join(__dirname, "preload.mjs"),
-      partition: "persist:google",
     },
   });
 
@@ -72,10 +69,12 @@ function createWindow() {
   if (VITE_DEV_SERVER_URL) {
     navigation.webContents.loadURL(VITE_DEV_SERVER_URL + "navigation.html");
   } else {
-    navigation.webContents.loadFile(path.join(RENDERER_DIST, "navigation.html"));
+    navigation.webContents.loadFile(
+      path.join(RENDERER_DIST, "navigation.html")
+    );
   }
 
-  // navigation.webContents.openDevTools({ mode: "undocked" });
+  navigation.webContents.openDevTools({ mode: "undocked" });
 
   win.contentView.addChildView(navigation, 1);
 
@@ -88,7 +87,7 @@ function createWindow() {
     },
   });
 
-  // html.webContents.openDevTools({ mode: "undocked" });
+  html.webContents.openDevTools({ mode: "undocked" });
 
   if (VITE_DEV_SERVER_URL) {
     html.webContents.loadURL(VITE_DEV_SERVER_URL);
@@ -101,6 +100,7 @@ function createWindow() {
   // ---------------------- CARGA INITIAL ------------------------
 
   web.setVisible(false);
+  navigation.setVisible(false);
 
   win.setMenuBarVisibility(false);
   win.maximize();
@@ -113,7 +113,7 @@ function createWindow() {
 
     const leftWidth = 400;
     const rightWidth = width - leftWidth;
-    const topHeight = 40;
+    const topHeight = 60;
     const bottomHeight = height - topHeight;
 
     navigation.setBounds({
@@ -148,26 +148,23 @@ function createWindow() {
 
   ipcMain.handle("web:visible", (_, isVisible) => {
     web.setVisible(isVisible);
+    navigation.setVisible(isVisible);
   });
 
   // -------------------- MODAL ----------------------------------
 
-  const processUrlChange = () => {
-    if (lastUrl === currentUrl) return;
-
-    html.webContents.send("url:change", lastUrl, currentUrl);
-
-    lastUrl = currentUrl;
-  };
-
   web.webContents.on("did-navigate", (_, url) => {
-    currentUrl = url;
-    processUrlChange();
+    if (lastUrl === url) return;
+    html.webContents.send("url:change", url);
+    navigation.webContents.send("url:change", url);
+    lastUrl = url;
   });
 
   web.webContents.on("did-navigate-in-page", (_, url) => {
-    currentUrl = url;
-    processUrlChange();
+    if (lastUrl === url) return;
+    html.webContents.send("url:change", url);
+    navigation.webContents.send("url:change", url);
+    lastUrl = url;
   });
 
   ipcMain.handle("modal", (_, isOpen) => {
@@ -191,6 +188,12 @@ function createWindow() {
   // ipcMain.on("counter:clicks", () => {});
 
   // -------------------- NAVEGACION ------------------------------
+
+  ipcMain.on("go-url", (_, url: string) => {
+    web.webContents.loadURL(
+      `https://www.google.com/search?q=${encodeURIComponent(url.trim())}`
+    );
+  });
 
   web.webContents.setWindowOpenHandler(({ url }) => {
     web.webContents.loadURL(url);

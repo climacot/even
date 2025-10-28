@@ -22,7 +22,7 @@ export const App = () => {
         ) : currentView === 4 ? (
           <View4 />
         ) : null}
-        <Toaster toastOptions={{ position: "bottom-center" }} />
+        <Toaster toastOptions={{ position: "top-right" }} />
       </div>
     </QueryClientProvider>
   );

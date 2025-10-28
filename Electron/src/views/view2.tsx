@@ -1,76 +1,63 @@
-import { Button } from "@/components/button";
-import { Error } from "@/components/error";
-import { Likert } from "@/components/likert";
-import { useStore } from "@/hooks/use-store";
-import { getTask } from "@/services/database";
-import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/buttons/button";
 import { Controller, useForm } from "react-hook-form";
+import { Layout } from "@/components/layouts/layout";
+import { Likert } from "@/components/inputs/likert";
+import { useStore } from "@/hooks/use-store";
+import { useTask } from "@/hooks/use-task";
 import toast from "react-hot-toast";
+import { Task } from "@/components/layouts/task";
+import { electron } from "@/services/electron";
 
 export const View2 = () => {
-  const query = useQuery({
-    queryKey: ["task"],
-    queryFn: getTask,
-  });
-
-  const { nextView, prevView, setFeeling, setTaskTimeStart, setTaskId } = useStore();
-
-  const form = useForm({
+  const { task } = useTask();
+  const { nextView, setFeeling, setTaskTimeStart, setTaskId } = useStore();
+  const { control, handleSubmit } = useForm({
     defaultValues: {
       experience: "",
       feeling: "",
     },
   });
 
+  const onSubmit = handleSubmit(async ({ feeling }) => {
+    setFeeling(Number(feeling));
+    setTaskId(task!.id);
+    setTaskTimeStart();
+
+    await electron.showBrowser();
+
+    toast.success("Tarea iniciada.");
+
+    nextView();
+  });
+
   return (
-    <form
-      className="p-4 flex flex-col gap-4"
-      onSubmit={form.handleSubmit(async ({ feeling }) => {
-        setFeeling(Number(feeling));
-        setTaskId(query.data!.id);
-        setTaskTimeStart();
-
-        await window.ipcRenderer.invoke("web:visible", true);
-
-        toast.success("Tarea iniciada.");
-
-        nextView();
-      })}
-    >
-      <div className="flex gap-2 items-center">
-        <button
-          className="bg-gray-100 rounded-full p-2 w-8 h-8 flex justify-center items-center cursor-pointer"
-          onClick={() => prevView()}
-        >
-          ←
-        </button>
-        <div className="font-bold text-2xl">SFE3000</div>
-      </div>
-      <div>Tarea</div>
-      <p>{query.data?.description ?? "..."}</p>
-      <Controller
-        name="feeling"
-        control={form.control}
-        rules={{ required: true }}
-        render={({ field: { onChange } }) => (
-          <Likert
-            label="¿Qué tan confiad@ se encuentra en que encontrará un datataset?"
-            values={["1", "2", "3", "4", "5"]}
-            labels={["poca", "neutral", "mucha"]}
-            onChange={(value) => onChange(value)}
-            variant="horizontal"
+    <form onSubmit={onSubmit}>
+      <Layout>
+        <Layout.Header>
+          <Task description={task?.description} />
+        </Layout.Header>
+        <Layout.Body>
+          <Controller
+            name="feeling"
+            control={control}
+            rules={{ required: true }}
+            render={({ field: { onChange } }) => (
+              <Likert
+                label="¿Qué tan seguro se encuentra en que encontrará almenos un resultado?"
+                values={["1", "2", "3", "4", "5"]}
+                labels={["poca seguro", "neutral", "muy seguro"]}
+                variant="horizontal"
+                onChange={onChange}
+              />
+            )}
           />
-        )}
-      />
-      {query.error && <Error message={query.error.message} />}
-      <Button
-        variant="solid"
-        color="blue"
-        disabled={!form.formState.isValid || !query.data}
-        type="submit"
-      >
-        Iniciar tarea 1
-      </Button>
+        </Layout.Body>
+        <Layout.Footer>
+          <Button disabled={!task} variant="solid" color="blue" type="submit">
+            Iniciar tarea
+          </Button>
+        </Layout.Footer>
+      </Layout>
     </form>
   );
 };

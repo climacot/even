@@ -4,7 +4,9 @@ import { ipcRenderer, contextBridge } from "electron";
 contextBridge.exposeInMainWorld("ipcRenderer", {
   on(...args: Parameters<typeof ipcRenderer.on>) {
     const [channel, listener] = args;
-    return ipcRenderer.on(channel, (event, ...args) => listener(event, ...args));
+    return ipcRenderer.on(channel, (event, ...args) =>
+      listener(event, ...args)
+    );
   },
   off(...args: Parameters<typeof ipcRenderer.off>) {
     const [channel, ...omit] = args;
@@ -18,15 +20,13 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
     const [channel, ...omit] = args;
     return ipcRenderer.invoke(channel, ...omit);
   },
-  removeAllListeners(...args: Parameters<typeof ipcRenderer.removeAllListeners>) {
+  removeAllListeners(
+    ...args: Parameters<typeof ipcRenderer.removeAllListeners>
+  ) {
     const [channel] = args;
     return ipcRenderer.removeAllListeners(channel);
   },
 
   // You can expose other APTs you need here.
   // ...
-});
-
-Object.defineProperty(navigator, "webdriver", {
-  get: () => false,
 });

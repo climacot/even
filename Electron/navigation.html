@@ -1,28 +1,108 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Document</title>
   </head>
-  <body style="height: 39px; border-bottom: 1px solid #e5e7eb; margin: 0px">
+  <body
+    style="
+      height: 59px;
+      border-bottom: 1px solid #e5e7eb;
+      margin: 0px;
+      font-size: 16px;
+    "
+  >
     <div
       style="
         display: flex;
         height: 100%;
         align-items: center;
-        padding: 0 0 0 16px;
+        padding: 0 16px 0 16px;
+        gap: 6px;
       "
     >
-      <button id="home">Inicio</button>
-      <button id="prev">Atras</button>
-      <button id="next">Adelante</button>
+      <button
+        class="text-neutral-800 hover:bg-gray-100 rounded-full p-2 cursor-pointer"
+        id="home"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+          />
+        </svg>
+      </button>
+      <button
+        class="text-neutral-800 hover:bg-gray-100 rounded-full p-2 cursor-pointer"
+        id="prev"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
+          />
+        </svg>
+      </button>
+      <button
+        class="text-neutral-800 hover:bg-gray-100 rounded-full p-2 cursor-pointer"
+        id="next"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+          />
+        </svg>
+      </button>
+      <form id="form" class="w-full">
+        <input
+          id="url"
+          class="bg-gray-100"
+          style="
+            padding-left: 8px;
+            padding-right: 8px;
+            height: 30px;
+            font-size: 14px;
+            width: 100%;
+            border-radius: 16px;
+            border: 0px;
+          "
+        />
+      </form>
       <span id="loader" style="display: none">Cargando...</span>
     </div>
     <script>
       const $home = document.getElementById("home");
       const $next = document.getElementById("next");
       const $prev = document.getElementById("prev");
+      const $url = document.getElementById("url");
+      const $form = document.getElementById("form");
       const $loader = document.getElementById("loader");
 
       $home.addEventListener("click", () => {
@@ -37,8 +117,17 @@
         window.ipcRenderer.send("go-back");
       });
 
-      window.ipcRenderer.on("browser:loading", (event, isLoading) => {
+      window.ipcRenderer.on("browser:loading", (_, isLoading) => {
         $loader.style.display = isLoading ? "inline" : "none";
+      });
+
+      window.ipcRenderer.on("url:change", (_, url) => {
+        $url.value = url;
+      });
+
+      $form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        window.ipcRenderer.send("go-url", $url.value);
       });
     </script>
   </body>

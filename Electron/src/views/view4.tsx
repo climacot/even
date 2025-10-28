@@ -1,56 +1,29 @@
-import { Button } from "@/components/button";
+import { Button } from "@/components/buttons/button";
+import TaskIcon from "@/components/icons/task";
 import { useStore } from "@/hooks/use-store";
-import { createSession } from "@/services/database";
-import { useState } from "react";
-import toast from "react-hot-toast";
 
 export const View4 = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const store = useStore();
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center p-4">
-      <div className="text-lg font-semibold">¡Tarea finalizada!</div>
-      <div className="mb-4">Gracias por participar en esta prueba</div>
+    <div className="min-h-screen flex flex-col justify-center items-center p-8 gap-12">
+      <div className="bg-yellow-50 p-12">
+        <TaskIcon />
+      </div>
+      <div className="text-center">
+        <div className="text-lg font-semibold">¡Tarea finalizada!</div>
+        <div className="mb-4">Gracias por participar en esta prueba.</div>
+      </div>
       <Button
         color="blue"
         variant="solid"
-        disabled={isLoading}
-        onClick={async () => {
-          try {
-            setIsLoading(true);
+        onClick={() => {
+          store.reset();
 
-            await createSession({
-              taskId: store.taskId!,
-              complex: store.complex!,
-              feeling: store.feeling!,
-              fullName: store.fullName!,
-              sessionId: store.sessionId!,
-              taskTimeEnd: store.taskTimeEnd!,
-              taskTimeStart: store.taskTimeStart!,
-              navigations: store.navigations
-                .filter((n) => n.rated)
-                .map((n) => ({
-                  ...n,
-                  rated: n.rated!,
-                  ratedAt: n.ratedAt!,
-                })),
-            });
-
-            store.reset();
-            toast.success("Sesión finalizada.");
-
-            window.ipcRenderer.send("go-home");
-          } catch (error) {
-            if (error instanceof Error) {
-              toast.error(error.message);
-            }
-          } finally {
-            setIsLoading(false);
-          }
+          window.ipcRenderer.send("go-home");
         }}
       >
-        Regresar al inicio
+        Iniciar nueva sesión
       </Button>
     </div>
   );
