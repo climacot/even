@@ -1,6 +1,7 @@
 import { Button } from "@/components/buttons/button";
 import { ComplexForm } from "@/components/forms/complex-form";
 import { createSession } from "@/services/database";
+import { driver } from "driver.js";
 import { electron } from "@/services/electron";
 import { Input } from "@/components/inputs/input";
 import { Layout } from "@/components/layouts/layout";
@@ -19,6 +20,7 @@ export const View3 = () => {
     currentUrl,
     navigations,
     addNavigation,
+    setModalIsOpen,
     ratedNavigation,
     setTaskTimeEnd,
     setCurrentUrl,
@@ -73,11 +75,70 @@ export const View3 = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    const driverjs = driver({
+      allowClose: false,
+      disableActiveInteraction: true,
+      nextBtnText: "Continuar",
+      prevBtnText: "Atrás",
+      onDestroyed: async () => {
+        await electron.closeModal();
+        setModalIsOpen(false);
+      },
+      steps: [
+        {
+          element: "#task",
+          popover: {
+            title: "Tarea",
+            description: "Según la tarea, vas a navegar por la web.",
+          },
+        },
+        {
+          element: "#web",
+          popover: {
+            title: "Navegador web",
+            description:
+              "Luego deberás navegar por internet buscando recursos web.",
+          },
+        },
+        {
+          element: "#calificate",
+          popover: {
+            title: "Calificar tarea",
+            description:
+              "Luego de encontrar un recurso web, presionas este botón para calificarlo. Puedes calificar los recursos que desees.",
+          },
+        },
+        {
+          element: "#list",
+          popover: {
+            title: "Lista de tareas calificadas",
+            description:
+              "Luego de calificar un recurso web lo encontrarás en esta lista.",
+          },
+        },
+        {
+          element: "#end",
+          popover: {
+            title: "Finalizar tarea",
+            description:
+              "Por último, presionas este botón para finalizar la tarea.",
+          },
+        },
+      ],
+    });
+
+    driverjs.drive();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <>
       <Layout>
         <Layout.Header>
-          <Task description={task?.description} />
+          <div id="task">
+            <Task description={task?.description} />
+          </div>
         </Layout.Header>
         <Layout.Body>
           <div
@@ -92,15 +153,19 @@ export const View3 = () => {
                 value={currentUrl}
                 onChange={() => {}}
               />
-              <Button color="yellow" onClick={onCalificateResource}>
-                Calificar recurso
-              </Button>
+              <div id="calificate">
+                <Button color="yellow" onClick={onCalificateResource}>
+                  Calificar recurso
+                </Button>
+              </div>
             </div>
             <Navigations navigations={resources} />
           </div>
         </Layout.Body>
         <Layout.Footer>
-          <Button onClick={onEndTask}>Finalizar tarea</Button>
+          <div id="end">
+            <Button onClick={onEndTask}>Finalizar tarea</Button>
+          </div>
         </Layout.Footer>
       </Layout>
       {isRatedModalOpen && (

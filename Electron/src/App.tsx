@@ -8,21 +8,24 @@ import { View3 } from "@/views/view3";
 import { View4 } from "@/views/view4";
 
 export const App = () => {
-  const { currentView } = useStore();
+  const { modalIsOpen, currentView } = useStore();
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="h-screen w-[400px] max-w-[400px] overflow-x-hidden border-r border-gray-200 bg-white">
-        {currentView === 1 ? (
-          <View1 />
-        ) : currentView === 2 ? (
-          <View2 />
-        ) : currentView === 3 ? (
-          <View3 />
-        ) : currentView === 4 ? (
-          <View4 />
-        ) : null}
-        <Toaster toastOptions={{ position: "top-right" }} />
+      <div className="flex h-screen">
+        <div className="w-[400px] max-w-[400px] overflow-x-hidden border-r border-gray-200 bg-white">
+          {currentView === 1 ? (
+            <View1 />
+          ) : currentView === 2 ? (
+            <View2 />
+          ) : currentView === 3 ? (
+            <View3 />
+          ) : currentView === 4 ? (
+            <View4 />
+          ) : null}
+          <Toaster toastOptions={{ position: "top-right" }} />
+        </div>
+        {modalIsOpen && <div id="web" className="flex-1" />}
       </div>
     </QueryClientProvider>
   );

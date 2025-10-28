@@ -11,12 +11,14 @@ type State = {
   taskTimeEnd?: Date;
   taskTimeStart?: Date;
   taskId?: string;
+  modalIsOpen?: boolean;
   navigations: {
     url: string;
     rated?: number;
     ratedAt?: Date;
     navigatedAt: Date;
   }[];
+  setModalIsOpen: (isOpen: boolean) => void;
   addNavigation: (url: string) => void;
   nextView: () => void;
   prevView: () => void;
@@ -46,6 +48,7 @@ const initialState = {
   taskTimeEnd: undefined,
   taskTimeStart: undefined,
   taskId: undefined,
+  modalIsOpen: undefined,
 };
 
 export const useStore = create<State>((set) => ({
@@ -76,4 +79,5 @@ export const useStore = create<State>((set) => ({
   setTaskTimeEnd: () => set({ taskTimeEnd: new Date() }),
   setTaskTimeStart: () => set({ taskTimeStart: new Date() }),
   setTaskId: (taskId) => set({ taskId }),
+  setModalIsOpen: (isOpen) => set({ modalIsOpen: isOpen }),
 }));

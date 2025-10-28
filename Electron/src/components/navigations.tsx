@@ -24,6 +24,7 @@ export const Navigations = ({
 
   return (
     <div
+      id="list"
       className="grid overflow-hidden"
       style={{ gridTemplateRows: "auto 1fr" }}
     >

@@ -1,16 +1,19 @@
 import { Button } from "@/components/buttons/button";
 import { Controller, useForm } from "react-hook-form";
+import { electron } from "@/services/electron";
 import { Layout } from "@/components/layouts/layout";
 import { Likert } from "@/components/inputs/likert";
+import { Task } from "@/components/layouts/task";
 import { useStore } from "@/hooks/use-store";
 import { useTask } from "@/hooks/use-task";
 import toast from "react-hot-toast";
-import { Task } from "@/components/layouts/task";
-import { electron } from "@/services/electron";
 
 export const View2 = () => {
   const { task } = useTask();
-  const { nextView, setFeeling, setTaskTimeStart, setTaskId } = useStore();
+
+  const { nextView, setFeeling, setTaskTimeStart, setTaskId, setModalIsOpen } =
+    useStore();
+
   const { control, handleSubmit } = useForm({
     defaultValues: {
       experience: "",
@@ -24,6 +27,8 @@ export const View2 = () => {
     setTaskTimeStart();
 
     await electron.showBrowser();
+    await electron.openModal();
+    setModalIsOpen(true);
 
     toast.success("Tarea iniciada.");
 

@@ -2,6 +2,7 @@ import ReactDOM from "react-dom/client";
 import { StrictMode } from "react";
 import { App } from "@/app";
 import "./assets/index.css";
+import "driver.js/dist/driver.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
