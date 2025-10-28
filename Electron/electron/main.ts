@@ -74,7 +74,7 @@ function createWindow() {
     );
   }
 
-  navigation.webContents.openDevTools({ mode: "undocked" });
+  // navigation.webContents.openDevTools({ mode: "undocked" });
 
   win.contentView.addChildView(navigation, 1);
 
@@ -87,7 +87,7 @@ function createWindow() {
     },
   });
 
-  html.webContents.openDevTools({ mode: "undocked" });
+  // html.webContents.openDevTools({ mode: "undocked" });
 
   if (VITE_DEV_SERVER_URL) {
     html.webContents.loadURL(VITE_DEV_SERVER_URL);
