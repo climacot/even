@@ -11,8 +11,7 @@ import toast from "react-hot-toast";
 export const View2 = () => {
   const { task } = useTask();
 
-  const { nextView, setFeeling, setTaskTimeStart, setTaskId, setModalIsOpen } =
-    useStore();
+  const { nextView, setFeeling, setTaskId, setModalIsOpen } = useStore();
 
   const { control, handleSubmit } = useForm({
     defaultValues: {
@@ -24,7 +23,6 @@ export const View2 = () => {
   const onSubmit = handleSubmit(async ({ feeling }) => {
     setFeeling(Number(feeling));
     setTaskId(task!.id);
-    setTaskTimeStart();
 
     await electron.showBrowser();
     await electron.openModal();

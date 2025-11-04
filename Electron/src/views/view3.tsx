@@ -22,6 +22,7 @@ export const View3 = () => {
     addNavigation,
     setModalIsOpen,
     ratedNavigation,
+    setTaskTimeStart,
     setTaskTimeEnd,
     setCurrentUrl,
     setComplex,
@@ -81,7 +82,9 @@ export const View3 = () => {
       disableActiveInteraction: true,
       nextBtnText: "Continuar",
       prevBtnText: "Atrás",
+      doneBtnText: "Entendido",
       onDestroyed: async () => {
+        setTaskTimeStart();
         await electron.closeModal();
         setModalIsOpen(false);
       },
