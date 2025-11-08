@@ -162,7 +162,10 @@ export const View3 = () => {
                 </Button>
               </div>
             </div>
-            <Navigations navigations={resources} />
+            <Navigations
+              navigations={resources}
+              onPressed={(url) => electron.goUrlFull(url)}
+            />
           </div>
         </Layout.Body>
         <Layout.Footer>

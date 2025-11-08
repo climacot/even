@@ -189,6 +189,10 @@ function createWindow() {
 
   // -------------------- NAVEGACION ------------------------------
 
+  ipcMain.on("go-url-full", (_, url: string) => {
+    web.webContents.loadURL(url);
+  });
+
   ipcMain.on("go-url", (_, url: string) => {
     web.webContents.loadURL(
       `https://www.google.com/search?q=${encodeURIComponent(url.trim())}`

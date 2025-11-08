@@ -51,7 +51,7 @@ export const View1 = () => {
           <br />
           <div>
             El propósito de esta actividad es que navegues en internet buscando
-            recursos web y evaluandolos segun la tarea propuesta en el siguiente
+            recursos web y evaluándolos según la tarea propuesta en el siguiente
             paso.
           </div>
         </Layout.Header>

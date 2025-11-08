@@ -23,10 +23,15 @@ const hideBrowser = () => {
   return window.ipcRenderer.invoke("web:visible", false);
 };
 
+const goUrlFull = (url: string) => {
+  window.ipcRenderer.send("go-url-full", url);
+};
+
 export const electron = {
   onUrlChange,
   openModal,
   closeModal,
   showBrowser,
   hideBrowser,
+  goUrlFull,
 };

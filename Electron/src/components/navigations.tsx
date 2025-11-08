@@ -4,7 +4,9 @@ import { useEffect, useRef } from "react";
 
 export const Navigations = ({
   navigations,
+  onPressed,
 }: {
+  onPressed: (url: string) => void;
   navigations: {
     url: string;
     rated?: number;
@@ -44,7 +46,11 @@ export const Navigations = ({
           </span>
         ) : (
           navigations.map((n, i) => (
-            <div key={i} className="flex gap-4">
+            <div
+              key={i}
+              className="flex gap-4 cursor-pointer hover:bg-gray-100"
+              onClick={() => onPressed(n.url)}
+            >
               <div className="flex items-center">
                 <WebIcon />
               </div>
