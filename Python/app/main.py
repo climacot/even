@@ -43,8 +43,12 @@ async def read_root(request: Request):
         response = scoped_supabase_client.rpc("get_unevaluated_resources", params={}).execute()
         
         for resource in response.data:
+            print(f"Evaluando el recurso ", resource["id"])
+            
             resource_id = resource["id"]
             web_url = resource["url"]
+            
+            print(f"Ejecutando el servicio de F-UJI ", resource["id"])
             
             response = requests.post(
                 url= fuji_url,
@@ -64,6 +68,8 @@ async def read_root(request: Request):
             )
             
             data = response.json()
+            
+            print(f"Ejecutado con éxito servicio de F-UJI ", resource["id"])
 
             f1 = data["summary"]["score_percent"]["F1"]
             f2 = data["summary"]["score_percent"]["F2"]
@@ -74,6 +80,8 @@ async def read_root(request: Request):
             i3 = data["summary"]["score_percent"]["I3"]
             fair_total = data["summary"]["score_percent"]["FAIR"]
 
+            print(f"Ejecutando el servicio de TECNOLOGIAS SEMANTICAS ", resource["id"])
+
             response = requests.post(
                 url=technologies_url,
                 json={
@@ -83,6 +91,8 @@ async def read_root(request: Request):
             
             tecnologies = response.json()
             
+            print(f"Ejecutado con éxito servicio de TECNOLOGIAS SEMANTICAS ", resource["id"])
+            
             microformats = tecnologies["microformats"]
             microdata = tecnologies["microdata"]
             jsonLd = tecnologies["jsonLd"]
@@ -90,6 +100,8 @@ async def read_root(request: Request):
             vocabularies = tecnologies["vocabularies"]
             ontologies = tecnologies["ontologies"]
             datasets = tecnologies["datasets"]
+        
+            print(f"Ejecutando el servicio de GOOGLE ", resource["id"])
         
             response = requests.get(
                 url=google_url,
@@ -101,6 +113,8 @@ async def read_root(request: Request):
             )
             
             google = response.json()
+            
+            print(f"Ejecutado con éxito servicio de GOOGLE ", resource["id"])
             
             seo = google["lighthouseResult"]["categories"]["seo"]["score"]
             accessibility = google["lighthouseResult"]["categories"]["accessibility"]["score"]
@@ -127,6 +141,8 @@ async def read_root(request: Request):
                 "p_accesibility_score": accessibility,
                 "p_performance_score": performance
             }).execute()
+            
+            print(f"TODO EJECUTADO CON NORMALIDAD ", resource["id"])
     except Exception:
         traceback.print_exc()
 

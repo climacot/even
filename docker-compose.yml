@@ -1,7 +1,7 @@
 version: "3.9"
 name: sfe3000
-include:
-  - path: ./Supabase/docker-compose.yml
+# include:
+#   - path: ./Supabase/docker-compose.yml
 services:
   python:
     build: ./Python
