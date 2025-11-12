@@ -35,10 +35,11 @@ export const ComplexForm = ({
           render={({ field: { onChange } }) => {
             return (
               <Likert
+                inverted
                 onChange={(value) => onChange(value)}
                 variant="horizontal"
                 values={["1", "2", "3", "4", "5"]}
-                labels={["tarea compleja", "neutral", "tarea fácil"]}
+                labels={["tarea fácil", "neutral", "tarea compleja"]}
               />
             );
           }}

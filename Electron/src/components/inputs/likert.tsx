@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import { useId } from "react";
 
 export const Likert = ({
@@ -5,12 +6,14 @@ export const Likert = ({
   values,
   labels,
   onChange,
+  inverted,
   variant,
   value,
 }: {
   label?: string;
   values: string[];
   labels: string[];
+  inverted?: boolean;
   onChange: (value: string) => void;
   variant: "vertical" | "horizontal";
   value?: string;
@@ -47,7 +50,14 @@ export const Likert = ({
   ) : variant === "horizontal" ? (
     <div>
       {label && <div className="font-medium mb-2">{label}</div>}
-      <div className="p-0.5 mb-1 rounded-md overflow-hidden bg-[linear-gradient(to_right,#FF2B2A,#FF8901,#FFC547,#25D654,#14A33A)]">
+      <div
+        className={clsx(
+          "p-0.5 mb-1 rounded-md overflow-hidden",
+          inverted
+            ? "bg-[linear-gradient(to_right,#14A33A,#25D654,#FFC547,#FF8901,#FF2B2A)]"
+            : "bg-[linear-gradient(to_right,#FF2B2A,#FF8901,#FFC547,#25D654,#14A33A)]"
+        )}
+      >
         <div className="flex flex-row bg-white rounded-sm overflow-hidden">
           {values.map((v) => (
             <label
