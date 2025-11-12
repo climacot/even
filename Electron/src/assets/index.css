@@ -3,3 +3,7 @@
 @theme {
   --font-sans: "Inter", sans-serif;
 }
+
+.driver-popover.driverjs-theme {
+  background-color: #fde047;
+}

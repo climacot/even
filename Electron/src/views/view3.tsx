@@ -83,6 +83,7 @@ export const View3 = () => {
       nextBtnText: "Continuar",
       prevBtnText: "Atrás",
       doneBtnText: "Entendido",
+      popoverClass: 'driverjs-theme',
       onDestroyed: async () => {
         setTaskTimeStart();
         await electron.closeModal();
