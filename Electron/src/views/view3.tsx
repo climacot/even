@@ -93,7 +93,7 @@ export const View3 = () => {
           element: "#task",
           popover: {
             title: "Tarea",
-            description: "Según la tarea, vas a navegar por la web.",
+            description: "Según esta tarea, va a navegar por la web.",
           },
         },
         {
@@ -101,7 +101,7 @@ export const View3 = () => {
           popover: {
             title: "Navegador web",
             description:
-              "Luego deberás navegar por internet buscando recursos web.",
+              "Luego deberá navegar por internet buscando recursos web.",
           },
         },
         {
@@ -109,7 +109,7 @@ export const View3 = () => {
           popover: {
             title: "Calificar tarea",
             description:
-              "Luego de encontrar un recurso web, presionas este botón para calificarlo. Puedes calificar los recursos que desees.",
+              "Luego de encontrar un recurso web, presiona este botón para calificarlo. Puede calificar los recursos que desee.",
           },
         },
         {
@@ -117,7 +117,7 @@ export const View3 = () => {
           popover: {
             title: "Lista de tareas calificadas",
             description:
-              "Luego de calificar un recurso web lo encontrarás en esta lista.",
+              "Luego de calificar un recurso web lo encontrará en esta lista.",
           },
         },
         {
@@ -125,7 +125,7 @@ export const View3 = () => {
           popover: {
             title: "Finalizar tarea",
             description:
-              "Por último, presionas este botón para finalizar la tarea.",
+              "Por último, presiona este botón para finalizar la tarea.",
           },
         },
       ],
@@ -152,7 +152,7 @@ export const View3 = () => {
               <Input
                 disabled
                 label="Recurso actual"
-                placeholder="Se autocompletará cuando navegues."
+                placeholder="Se autocompletará cuando navegue."
                 value={currentUrl}
                 onChange={() => {}}
               />

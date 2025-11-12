@@ -44,13 +44,13 @@ export const View1 = () => {
       <Layout>
         <Layout.Header>
           <div className="text-neutral-950">
-            ¡Gracias por hacer parte en esta prueba! A continuación realizarás
+            ¡Gracias por hacer parte en esta prueba! A continuación realizará
             una evaluación de la encontrabilidad de la información como parte de
             un trabajo de grado del programa de Ingeniería de Sistemas.
           </div>
           <br />
           <div>
-            El propósito de esta actividad es que navegues en internet buscando
+            El propósito de esta actividad es que navegue en internet buscando
             recursos web y evaluándolos según la tarea propuesta en el siguiente
             paso.
           </div>
