@@ -177,7 +177,10 @@ export const View3 = () => {
       {isRatedModalOpen && (
         <LayoutModal>
           <NavigationForm
-            onClose={closeRatedModal}
+            onClose={async () => {
+              closeRatedModal();
+              await electron.closeModal();
+            }}
             onSubmit={async ({ rated }) => {
               ratedNavigation(currentUrl!, Number(rated));
               closeRatedModal();
@@ -191,7 +194,10 @@ export const View3 = () => {
         <LayoutModal>
           <ComplexForm
             isLoading={isLoading}
-            onClose={closeComplexModal}
+            onClose={async () => {
+              closeComplexModal();
+              await electron.closeModal();
+            }}
             onSubmit={async ({ rated }) => {
               try {
                 setIsLoading(true);
