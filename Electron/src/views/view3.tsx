@@ -126,7 +126,7 @@ export const View3 = () => {
           popover: {
             title: "Finalizar tarea",
             description:
-              "Por último, presiona este botón para finalizar la tarea.",
+              "Por último, presione este botón para finalizar la tarea.",
           },
         },
       ],
