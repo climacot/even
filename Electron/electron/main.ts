@@ -154,17 +154,29 @@ function createWindow() {
   // -------------------- MODAL ----------------------------------
 
   web.webContents.on("did-navigate", (_, url) => {
-    if (lastUrl === url) return;
-    html.webContents.send("url:change", url);
-    navigation.webContents.send("url:change", url);
-    lastUrl = url;
+    const formatedUrl = url.startsWith("https://translate.google.com")
+      ? extraerURLOriginal(url) !== null
+        ? extraerURLOriginal(url)!
+        : url
+      : url;
+
+    if (lastUrl === formatedUrl) return;
+    html.webContents.send("url:change", formatedUrl);
+    navigation.webContents.send("url:change", formatedUrl);
+    lastUrl = formatedUrl;
   });
 
   web.webContents.on("did-navigate-in-page", (_, url) => {
-    if (lastUrl === url) return;
-    html.webContents.send("url:change", url);
-    navigation.webContents.send("url:change", url);
-    lastUrl = url;
+    const formatedUrl = url.startsWith("https://translate.google.com")
+      ? extraerURLOriginal(url) !== null
+        ? extraerURLOriginal(url)!
+        : url
+      : url;
+
+    if (lastUrl === formatedUrl) return;
+    html.webContents.send("url:change", formatedUrl);
+    navigation.webContents.send("url:change", formatedUrl);
+    lastUrl = formatedUrl;
   });
 
   ipcMain.handle("modal", (_, isOpen) => {
@@ -225,6 +237,15 @@ function createWindow() {
     if (!web.webContents.navigationHistory.canGoForward()) return;
     web.webContents.navigationHistory.goForward();
   });
+}
+
+function extraerURLOriginal(url: string) {
+  const params = new URL(url).searchParams;
+
+  // Prioriza el parámetro "u", si no existe usa "parent" o "pfu"
+  const raw = params.get("u") || params.get("parent") || params.get("pfu");
+
+  return raw ? decodeURIComponent(raw) : null;
 }
 
 // Quit when all windows are closed, except on macOS. There, it's common
