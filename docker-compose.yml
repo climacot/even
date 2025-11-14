@@ -6,14 +6,14 @@ services:
   python:
     build: ./Python
     container_name: python_service
-    environment:      
+    environment:
       GOOGLE_URL: https://www.googleapis.com/pagespeedonline/v5/runPagespeed
       FUJI_URL: http://fuji:1071/fuji/api/v1/evaluate
-      TECHNOLOGIES_URL: http://node:2000
+      TECHNOLOGIES_URL: http://node:4000
       SUPABASE_URL: ${SUPABASE_URL}
       SUPABASE_KEY: ${SUPABASE_KEY}
       GOOGLE_KEY: ${GOOGLE_KEY}
-      PORT: 8200    
+      PORT: 8200
     ports:
       - "8200:8200"
     depends_on:
