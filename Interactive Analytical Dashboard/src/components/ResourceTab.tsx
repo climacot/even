@@ -12,6 +12,7 @@ import {
   ResponsiveContainer,
   ScatterChart,
   Scatter,
+  Label,
 } from "recharts";
 
 // Custom Tooltip para los gráficos de barras
@@ -47,29 +48,76 @@ const CustomBarTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-// Datos para gráficos de dispersión
-const scatterDataClicks = Array.from({ length: 50 }, () => ({
-  x: Math.random() * 10,
-  y: Math.random() * 10,
-}));
+function intervalToSeconds(interval: string): number {
+  const [h, m, s] = interval.split(":");
+  const [sec, ms] = s.split(".");
 
-const scatterDataTime = Array.from({ length: 50 }, () => ({
-  x: Math.random() * 10,
-  y: Math.random() * 10,
-}));
+  return (
+    Number(h) * 3600 +
+    Number(m) * 60 +
+    Number(sec) +
+    (ms ? Number(ms) / 1000 : 0)
+  );
+}
+
+function intervalToMinutes(interval: string): number {
+  const [h, m, s] = interval.split(":");
+  const [sec, ms] = s.split(".");
+
+  const totalSeconds =
+    Number(h) * 3600 +
+    Number(m) * 60 +
+    Number(sec) +
+    (ms ? Number(ms) / 1000 : 0);
+
+  return totalSeconds / 60;
+}
+
+const scatterDataService = async () => {
+  const {
+    data,
+  }: {
+    data: {
+      promedio_pertinence: number;
+      promedio_clicks: number;
+      promedio_tiempo_hasta_encontrar: string;
+    }[];
+  } = await supabase.rpc("datos_graficos_dispersion").throwOnError();
+
+  if (!data) return { clicks: [], time: [] };
+
+  const clicks = data.map((d, i) => ({
+    p: d.promedio_pertinence,
+    x: i + 1,
+    y: parseFloat(d.promedio_clicks.toFixed(2)),
+  }));
+
+  const time = data.map((d, i) => ({
+    p: d.promedio_pertinence,
+    x: i + 1,
+    y: parseFloat(
+      intervalToMinutes(d.promedio_tiempo_hasta_encontrar).toFixed(2)
+    ),
+  }));
+
+  return { clicks, time };
+};
 
 const resourcesService = async () => {
   const {
     data,
   }: {
-    data: Array<{ url: string; pertinence: number; qualifications: number }>;
-  } = await supabase.rpc("get_resources_summary").throwOnError();
+    data: Array<{
+      url: string;
+      pertinence: number;
+      qualifications: number;
+    }>;
+  } = await supabase.rpc("obtener_datos_tabla").throwOnError();
 
   if (!data) return [];
 
   return data.map((r, i) => ({
     ...r,
-    pertinence: parseFloat(r.pertinence.toFixed(2)),
     rank: i + 1,
   }));
 };
@@ -265,6 +313,11 @@ const fairDataService = async () => {
 };
 
 export function ResourceTab() {
+  const scatterData = useQuery({
+    queryKey: ["scatterData"],
+    queryFn: scatterDataService,
+  });
+
   const fairData = useQuery({
     queryKey: ["fairData"],
     queryFn: fairDataService,
@@ -565,33 +618,60 @@ export function ResourceTab() {
                   <XAxis
                     type="number"
                     dataKey="x"
-                    name="Recurso"
                     stroke="var(--muted-foreground)"
                     style={{ fontSize: "12px" }}
-                  />
+                  >
+                    <Label
+                      value="Top recursos"
+                      position="insideBottom"
+                      offset={-5}
+                      style={{
+                        fill: "var(--muted-foreground)",
+                        fontSize: "12px",
+                      }}
+                    />
+                  </XAxis>
+
                   <YAxis
                     type="number"
                     dataKey="y"
-                    name="Clics"
                     stroke="var(--muted-foreground)"
                     style={{ fontSize: "12px" }}
-                  />
+                  >
+                    <Label
+                      value="Prom. clics (n)"
+                      angle={-90}
+                      position="insideLeft"
+                      style={{
+                        fill: "var(--muted-foreground)",
+                        fontSize: "12px",
+                      }}
+                    />
+                  </YAxis>
                   <Tooltip
                     cursor={{ strokeDasharray: "3 3" }}
                     contentStyle={{
                       backgroundColor: "var(--popover)",
                       border: "1px solid var(--border)",
                       borderRadius: "var(--radius)",
-                      color: "var(--popover-foreground)",
+                    }}
+                    itemStyle={{
+                      color: "white",
                     }}
                   />
-                  <Scatter data={scatterDataClicks} fill="rgb(34, 197, 94)" />
+
                   <Scatter
-                    data={scatterDataClicks.slice(0, 20)}
+                    data={scatterData.data?.clicks.filter((v) => v.p >= 4)}
+                    fill="rgb(34, 197, 94)"
+                  />
+                  <Scatter
+                    data={scatterData.data?.clicks.filter(
+                      (v) => v.p >= 3 && v.p < 4
+                    )}
                     fill="rgb(234, 179, 8)"
                   />
                   <Scatter
-                    data={scatterDataClicks.slice(0, 30)}
+                    data={scatterData.data?.clicks.filter((v) => v.p < 3)}
                     fill="rgb(239, 68, 68)"
                   />
                 </ScatterChart>
@@ -621,33 +701,60 @@ export function ResourceTab() {
                   <XAxis
                     type="number"
                     dataKey="x"
-                    name="Recurso"
                     stroke="var(--muted-foreground)"
                     style={{ fontSize: "12px" }}
-                  />
+                  >
+                    <Label
+                      value="Top recursos"
+                      position="insideBottom"
+                      offset={-5}
+                      style={{
+                        fill: "var(--muted-foreground)",
+                        fontSize: "12px",
+                      }}
+                    />
+                  </XAxis>
+
                   <YAxis
                     type="number"
                     dataKey="y"
-                    name="Tiempo"
                     stroke="var(--muted-foreground)"
                     style={{ fontSize: "12px" }}
-                  />
+                  >
+                    <Label
+                      value="Prom. tiempo (m)"
+                      angle={-90}
+                      position="insideLeft"
+                      style={{
+                        fill: "var(--muted-foreground)",
+                        fontSize: "12px",
+                      }}
+                    />
+                  </YAxis>
                   <Tooltip
                     cursor={{ strokeDasharray: "3 3" }}
                     contentStyle={{
                       backgroundColor: "var(--popover)",
                       border: "1px solid var(--border)",
                       borderRadius: "var(--radius)",
-                      color: "var(--popover-foreground)",
+                    }}
+                    itemStyle={{
+                      color: "white",
                     }}
                   />
-                  <Scatter data={scatterDataTime} fill="rgb(34, 197, 94)" />
+
                   <Scatter
-                    data={scatterDataTime.slice(0, 20)}
+                    data={scatterData.data?.time.filter((v) => v.p >= 4)}
+                    fill="rgb(34, 197, 94)"
+                  />
+                  <Scatter
+                    data={scatterData.data?.time.filter(
+                      (v) => v.p >= 3 && v.p < 4
+                    )}
                     fill="rgb(234, 179, 8)"
                   />
                   <Scatter
-                    data={scatterDataTime.slice(0, 30)}
+                    data={scatterData.data?.time.filter((v) => v.p < 3)}
                     fill="rgb(239, 68, 68)"
                   />
                 </ScatterChart>

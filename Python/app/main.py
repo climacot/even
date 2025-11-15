@@ -103,22 +103,22 @@ async def read_root(request: Request):
         
             print(f"Ejecutando el servicio de GOOGLE ", resource["id"])
         
-            response = requests.get(
-                url=google_url,
-                params={
-                    "url": web_url,
-                    "key": google_api_key,
-                    "category": ["accessibility", "performance", "seo"]
-                }
-            )
+            # response = requests.get(
+            #     url=google_url,
+            #     params={
+            #         "url": web_url,
+            #         "key": google_api_key,
+            #         "category": ["accessibility", "performance", "seo"]
+            #     }
+            # )
             
-            google = response.json()
+            #google = response.json()
             
             print(f"Ejecutado con éxito servicio de GOOGLE ", resource["id"])
             
-            seo = google["lighthouseResult"]["categories"]["seo"]["score"]
-            accessibility = google["lighthouseResult"]["categories"]["accessibility"]["score"]
-            performance = google["lighthouseResult"]["categories"]["performance"]["score"]
+            seo = 0 #google["lighthouseResult"]["categories"]["seo"]["score"]
+            accessibility = 0 #google["lighthouseResult"]["categories"]["accessibility"]["score"]
+            performance = 0 #google["lighthouseResult"]["categories"]["performance"]["score"]
             
             scoped_supabase_client.rpc("add_automatic_evaluation", params={
                 "p_resource_id": resource_id,
