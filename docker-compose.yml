@@ -24,9 +24,9 @@ services:
     container_name: node_service
     environment:
       NODE_ENV: production
-      PORT: 2000
+      PORT: 4000
     ports:
-      - "2000:2000"
+      - "4000:4000"
   fuji:
     container_name: fuji_service
     image: ghcr.io/pangaea-data-publisher/fuji
