@@ -35,14 +35,14 @@ app.add_middleware(
 
 @app.post("/")
 async def read_root(request: Request):
-    try:
-        auth_header = request.headers.get("Authorization")
-        access_token = auth_header.split(" ")[1]
-        
-        scoped_supabase_client = supabase.postgrest.auth(access_token)
-        response = scoped_supabase_client.rpc("get_unevaluated_resources", params={}).execute()
-        
-        for resource in response.data:
+    auth_header = request.headers.get("Authorization")
+    access_token = auth_header.split(" ")[1]
+    
+    scoped_supabase_client = supabase.postgrest.auth(access_token)
+    response = scoped_supabase_client.rpc("get_unevaluated_resources", params={}).execute()
+    
+    for resource in response.data:
+        try:
             print(f"Evaluando el recurso ", resource["id"])
             
             resource_id = resource["id"]
@@ -143,8 +143,8 @@ async def read_root(request: Request):
             }).execute()
             
             print(f"TODO EJECUTADO CON NORMALIDAD ", resource["id"])
-    except Exception:
-        traceback.print_exc()
+        except Exception:
+            traceback.print_exc()
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8200))
