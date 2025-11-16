@@ -13,6 +13,7 @@ import {
   ScatterChart,
   Scatter,
   Label,
+  ErrorBar,
 } from "recharts";
 
 // Custom Tooltip para los gráficos de barras
@@ -47,18 +48,6 @@ const CustomBarTooltip = ({ active, payload, label }: any) => {
   }
   return null;
 };
-
-function intervalToSeconds(interval: string): number {
-  const [h, m, s] = interval.split(":");
-  const [sec, ms] = s.split(".");
-
-  return (
-    Number(h) * 3600 +
-    Number(m) * 60 +
-    Number(sec) +
-    (ms ? Number(ms) / 1000 : 0)
-  );
-}
 
 function intervalToMinutes(interval: string): number {
   const [h, m, s] = interval.split(":");
@@ -118,12 +107,13 @@ const resourcesService = async () => {
 
   return data.map((r, i) => ({
     ...r,
+    pertinence: parseFloat(r.pertinence.toFixed(2)),
     rank: i + 1,
   }));
 };
 
 export type ResourceDetails = {
-  pertinence: number;
+  promedio_pertinencia: number;
   num_microdata: number;
   num_microformats: number;
   num_rdfa: number;
@@ -146,12 +136,14 @@ export type ResourceDetails = {
 
 const semanticDataService = async () => {
   const { data }: { data: ResourceDetails[] } = await supabase
-    .rpc("get_resource_details")
+    .rpc("datos_evaluacion_automatica")
     .throwOnError();
 
-  const alta = data.filter((r) => r.pertinence >= 4);
-  const media = data.filter((r) => r.pertinence >= 3 && r.pertinence < 4);
-  const baja = data.filter((r) => r.pertinence <= 2);
+  const alta = data.filter((r) => r.promedio_pertinencia >= 4);
+  const media = data.filter(
+    (r) => r.promedio_pertinencia >= 3 && r.promedio_pertinencia < 4
+  );
+  const baja = data.filter((r) => r.promedio_pertinencia <= 2);
 
   const calculateAverage = (
     group: ResourceDetails[],
@@ -166,56 +158,100 @@ const semanticDataService = async () => {
     {
       category: "Microdatos",
       Alta: calculateAverage(alta, "num_microdata"),
+      AltaMax: Math.max(...alta.map((r) => r.num_microdata)),
+      AltaMin: Math.min(...alta.map((r) => r.num_microdata)),
       Media: calculateAverage(media, "num_microdata"),
+      MediaMax: Math.max(...media.map((r) => r.num_microdata)),
+      MediaMin: Math.min(...media.map((r) => r.num_microdata)),
       Baja: calculateAverage(baja, "num_microdata"),
+      BajaMax: Math.max(...baja.map((r) => r.num_microdata)),
+      BajaMin: Math.min(...baja.map((r) => r.num_microdata)),
     },
     {
       category: "Microformatos",
       Alta: calculateAverage(alta, "num_microformats"),
+      AltaMax: Math.max(...alta.map((r) => r.num_microformats)),
+      AltaMin: Math.min(...alta.map((r) => r.num_microformats)),
       Media: calculateAverage(media, "num_microformats"),
+      MediaMax: Math.max(...media.map((r) => r.num_microformats)),
+      MediaMin: Math.min(...media.map((r) => r.num_microformats)),
       Baja: calculateAverage(baja, "num_microformats"),
+      BajaMax: Math.max(...baja.map((r) => r.num_microformats)),
+      BajaMin: Math.min(...baja.map((r) => r.num_microformats)),
     },
     {
       category: "RDFa",
       Alta: calculateAverage(alta, "num_rdfa"),
+      AltaMax: Math.max(...alta.map((r) => r.num_rdfa)),
+      AltaMin: Math.min(...alta.map((r) => r.num_rdfa)),
       Media: calculateAverage(media, "num_rdfa"),
+      MediaMax: Math.max(...media.map((r) => r.num_rdfa)),
+      MediaMin: Math.min(...media.map((r) => r.num_rdfa)),
       Baja: calculateAverage(baja, "num_rdfa"),
+      BajaMax: Math.max(...baja.map((r) => r.num_rdfa)),
+      BajaMin: Math.min(...baja.map((r) => r.num_rdfa)),
     },
     {
       category: "Json-LD",
       Alta: calculateAverage(alta, "num_jsonld"),
+      AltaMax: Math.max(...alta.map((r) => r.num_jsonld)),
+      AltaMin: Math.min(...alta.map((r) => r.num_jsonld)),
       Media: calculateAverage(media, "num_jsonld"),
+      MediaMax: Math.max(...media.map((r) => r.num_jsonld)),
+      MediaMin: Math.min(...media.map((r) => r.num_jsonld)),
       Baja: calculateAverage(baja, "num_jsonld"),
+      BajaMax: Math.max(...baja.map((r) => r.num_jsonld)),
+      BajaMin: Math.min(...baja.map((r) => r.num_jsonld)),
     },
     {
       category: "Vocabulario",
       Alta: calculateAverage(alta, "num_vocabularies"),
+      AltaMax: Math.max(...alta.map((r) => r.num_vocabularies)),
+      AltaMin: Math.min(...alta.map((r) => r.num_vocabularies)),
       Media: calculateAverage(media, "num_vocabularies"),
+      MediaMax: Math.max(...media.map((r) => r.num_vocabularies)),
+      MediaMin: Math.min(...media.map((r) => r.num_vocabularies)),
       Baja: calculateAverage(baja, "num_vocabularies"),
+      BajaMax: Math.max(...baja.map((r) => r.num_vocabularies)),
+      BajaMin: Math.min(...baja.map((r) => r.num_vocabularies)),
     },
     {
       category: "Conj. datos",
       Alta: calculateAverage(alta, "num_datasets"),
+      AltaMax: Math.max(...alta.map((r) => r.num_datasets)),
+      AltaMin: Math.min(...alta.map((r) => r.num_datasets)),
       Media: calculateAverage(media, "num_datasets"),
+      MediaMax: Math.max(...media.map((r) => r.num_datasets)),
+      MediaMin: Math.min(...media.map((r) => r.num_datasets)),
       Baja: calculateAverage(baja, "num_datasets"),
+      BajaMax: Math.max(...baja.map((r) => r.num_datasets)),
+      BajaMin: Math.min(...baja.map((r) => r.num_datasets)),
     },
     {
       category: "Ontologías",
       Alta: calculateAverage(alta, "num_ontologies"),
+      AltaMax: Math.max(...alta.map((r) => r.num_ontologies)),
+      AltaMin: Math.min(...alta.map((r) => r.num_ontologies)),
       Media: calculateAverage(media, "num_ontologies"),
+      MediaMax: Math.max(...media.map((r) => r.num_ontologies)),
+      MediaMin: Math.min(...media.map((r) => r.num_ontologies)),
       Baja: calculateAverage(baja, "num_ontologies"),
+      BajaMax: Math.max(...baja.map((r) => r.num_ontologies)),
+      BajaMin: Math.min(...baja.map((r) => r.num_ontologies)),
     },
   ];
 };
 
 const webQualityDataService = async () => {
   const { data }: { data: ResourceDetails[] } = await supabase
-    .rpc("get_resource_details")
+    .rpc("datos_evaluacion_automatica")
     .throwOnError();
 
-  const alta = data.filter((r) => r.pertinence >= 4);
-  const media = data.filter((r) => r.pertinence >= 3 && r.pertinence < 4);
-  const baja = data.filter((r) => r.pertinence <= 2);
+  const alta = data.filter((r) => r.promedio_pertinencia >= 4);
+  const media = data.filter(
+    (r) => r.promedio_pertinencia >= 3 && r.promedio_pertinencia < 4
+  );
+  const baja = data.filter((r) => r.promedio_pertinencia <= 2);
 
   const calculateAverage = (
     group: ResourceDetails[],
@@ -250,12 +286,14 @@ const webQualityDataService = async () => {
 
 const fairDataService = async () => {
   const { data }: { data: ResourceDetails[] } = await supabase
-    .rpc("get_resource_details")
+    .rpc("datos_evaluacion_automatica")
     .throwOnError();
 
-  const alta = data.filter((r) => r.pertinence >= 4);
-  const media = data.filter((r) => r.pertinence >= 3 && r.pertinence < 4);
-  const baja = data.filter((r) => r.pertinence <= 2);
+  const alta = data.filter((r) => r.promedio_pertinencia >= 4);
+  const media = data.filter(
+    (r) => r.promedio_pertinencia >= 3 && r.promedio_pertinencia < 4
+  );
+  const baja = data.filter((r) => r.promedio_pertinencia <= 2);
 
   const calculateAverage = (
     group: ResourceDetails[],
@@ -400,7 +438,6 @@ export function ResourceTab() {
         >
           Análisis de tecnologías semánticas según los grupos de pertinencia
         </p>
-
         <div style={{ display: "flex", flexDirection: "column", gap: "32px" }}>
           {/* Pertinencia vs Estructuración semántica */}
           <div
@@ -451,7 +488,6 @@ export function ResourceTab() {
               </ResponsiveContainer>
             </div>
           </div>
-
           {/* Pertinencia vs Calidad web */}
           <div
             style={{
@@ -501,7 +537,6 @@ export function ResourceTab() {
               </ResponsiveContainer>
             </div>
           </div>
-
           {/* Pertinencia vs FAIR */}
           <div
             style={{
