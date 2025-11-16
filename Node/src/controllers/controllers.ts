@@ -24,14 +24,34 @@ export const getSemanticTecnologies = async (url: string) => {
   const ontologyKeywords = ["ontology", "rdf", "rdfs", "owl", "sparql", "turtle", "rdf+xml"];
   const datasetKeywords = ["dataset", "data catalog", "datacatalog", "distribution", "data.gov", "linked data"];
 
+    const sourcesText = [
+    JSON.stringify(microformats).toLowerCase(),
+    JSON.stringify(microdata).toLowerCase(),
+    JSON.stringify(jsonLd).toLowerCase(),
+    JSON.stringify(rdfa).toLowerCase(),
+  ];
+
+  const countInSources = (keywords: string[]) => {
+    return keywords.reduce((acc, kw) => {
+      const regex = new RegExp(kw.toLowerCase(), "g");
+
+      const totalMatches = sourcesText.reduce((sum, text) => {
+        const matches = text.match(regex);
+        return sum + (matches ? matches.length : 0);
+      }, 0);
+
+      return acc + totalMatches;
+    }, 0);
+  };
+
   return {
     microformats: microformats.items.length,
     microdata: microdata.length,
     jsonLd: jsonLd.length,
     rdfa: rdfa.length,
-    vocabularies: 0,
-    ontologies: 0,
-    datasets: 0,
+    vocabularies: countInSources(vocabKeywords),
+    ontologies: countInSources(ontologyKeywords),
+    datasets: countInSources(datasetKeywords),
   };
 };
 

@@ -1,0 +1,11 @@
+0. cantidad de sesiones, cantidad de recursos calificados, promedio tiempo por sesion, promedio calificaciones por sesion
+1. analizar las web que la misma cantidad de personas calificaron (variables vs pertinencia)
+	- estructuracion semantica
+	- calidad web
+	- fair
+2. analizar todas las web calificadas con pertinencia (pertinencia vs tiempo hasta encontrar)
+3. analizar todas las web calificadas con pertinencia (pertinencia vs cantidad webs hasta encontrar)
+4. analizar para todas las sesiones (complejidad vs sentimientio vs tiempo total vs cantidad de navegaciones)
+5. analizar el recurso con menor, media y mayor (identificado por color) pertinencia y mayor cantidad de calificaciones y hacer grafico de radar
+	- calidad web
+	- fair

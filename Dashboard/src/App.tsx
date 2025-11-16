@@ -1,35 +1,51 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { EvaluacionAutomatica } from "./components/EvaluacionAutomatica";
+import { PertinenciaTiempo } from "./components/PertinenciaTiempo";
+import { ResumeCard } from "./components/ResumeCard";
+import { hooks } from "./utils/hooks";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const cantidadSesiones = hooks.useCantidadSesiones();
+  const cantidadRecursosCalificados = hooks.useCantidadRecursosCalificados();
+  const promedioTiempoSesion = hooks.usePromedioTiempoSesion();
+  const primedioRecursosCalificados = hooks.usePromedioRecursosCalificados();
+  const recursosPertinenciaConteo = hooks.useRecursoPertinenciaConteo();
+  const recursosPertienenciaTiempo =
+    hooks.useRecursosPertinenciaTiempoEncontrar();
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      {cantidadSesiones.data && (
+        <ResumeCard
+          title="Total de sesiones"
+          value={cantidadSesiones.data.data}
+        />
+      )}
+      {cantidadRecursosCalificados.data && (
+        <ResumeCard
+          title="Total de recursos calificados"
+          value={cantidadRecursosCalificados.data.data}
+        />
+      )}
+      {promedioTiempoSesion.data && (
+        <ResumeCard
+          title="Promedio tiempo por sesión"
+          value={promedioTiempoSesion.data.data}
+        />
+      )}
+      {primedioRecursosCalificados.data && (
+        <ResumeCard
+          title="Promedio recursos calificados por sesión"
+          value={primedioRecursosCalificados.data.data}
+        />
+      )}
+      {recursosPertinenciaConteo.data && (
+        <EvaluacionAutomatica recursos={recursosPertinenciaConteo.data} />
+      )}
+      {recursosPertienenciaTiempo.data && (
+        <PertinenciaTiempo recursos={recursosPertienenciaTiempo.data} />
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
