@@ -32,11 +32,3 @@ services:
     image: ghcr.io/pangaea-data-publisher/fuji
     ports:
       - "1071:1071"
-  dashboard:
-    build: ./Vite
-    container_name: vite_service
-    environment:
-      VITE_SUPABASE_URL: ${SUPABASE_URL}
-      VITE_SUPABASE_ANON_KEY: ${SUPABASE_KEY}
-    ports:
-      - "3000:3000"
