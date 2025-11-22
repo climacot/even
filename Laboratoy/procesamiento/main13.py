@@ -88,8 +88,8 @@ print("Valores cercanos a 0: No hay relación aparente.")
 # en la "Complejidad Percibida".
 
 # Definimos variables
-X = df[['sentimiento_encontrabilidad', 'calificacion_pertinencia']]
-y = df['complejidad_percibida']
+X = df[['sentimiento_encontrabilidad', 'complejidad_percibida', 'tiempo_hasta_encontrar', 'navegaciones_hasta_encontrar']]
+y = df['calificacion_pertinencia']
 
 # Añadimos constante para el intercepto
 X = sm.add_constant(X)
